@@ -5,7 +5,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 interface HeaderProps  {
   onMenuClick: ()=>void;
 }
-const Header = (onMenuClick:HeaderProps) => {
+const Header = ({onMenuClick}:HeaderProps) => {
   return (
     <header className="h-16 bg-card border-b border-border flex items-center justify-between px-4 gap-4">
       <div className="flex items-center gap-2">
@@ -13,7 +13,7 @@ const Header = (onMenuClick:HeaderProps) => {
           variant='ghost'
           size='icon'
           className="lg:hidden"
-          onClick={()=>onMenuClick}
+          onClick={onMenuClick}
         >
           <Menu className="h-5 w-5"/>
         </Button>
