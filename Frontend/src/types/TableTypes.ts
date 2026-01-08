@@ -39,3 +39,8 @@ export type FolderItem = {
     ownerId: string;
     itemCount: number;
 }
+
+export type BreadcrumbItem = {
+  id: string | null;
+  name: string;
+}
