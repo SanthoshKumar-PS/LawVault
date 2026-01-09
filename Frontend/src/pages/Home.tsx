@@ -143,7 +143,12 @@ const FileManagerContent = () => {
 
       </div>
 
-
+      {/* Modals */}
+      <NewItemModal
+        open={newItemModalOpen}
+        onOpenChange={setNewItemModalOpen}
+        onStartUpload={handleStartUpload}
+      />
     </div>
   )
 }
