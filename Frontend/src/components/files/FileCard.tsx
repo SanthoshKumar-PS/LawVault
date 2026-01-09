@@ -33,6 +33,7 @@ const FileCard = ({ file, viewMode, onMoveClick }:FileCardProps) => {
     const isSelected = selectedItems.includes(file.id);
 
     const handleClick = (e:React.MouseEvent) => {
+        console.log("File id added:", file.id)
         selectItem(file.id, e.ctrlKey || e.metaKey);
     }
 
@@ -44,7 +45,7 @@ const FileCard = ({ file, viewMode, onMoveClick }:FileCardProps) => {
                 onClick={handleClick}
                 className={cn(
                     'flex items-center gap-4 px-4 py-3 rounded-lg cursor-pointer transition-colors border border-transparent group hover:bg-primary/10',
-                    isSelected && 'bg-primary/5 border-primary/20'
+                    isSelected && 'bg-primary/50 border-primary/20'
                 )}
             >
                 <FileIcon type={file.type} extension={file.extension} size='md'/>
@@ -99,10 +100,6 @@ const FileCard = ({ file, viewMode, onMoveClick }:FileCardProps) => {
 
         </motion.div>
     )
-
-  return (
-    <div>FileCard</div>
-  )
 }
 
 export default FileCard

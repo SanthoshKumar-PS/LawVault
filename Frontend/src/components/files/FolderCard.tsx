@@ -32,6 +32,7 @@ const FolderCard = ({folder, viewMode, onRename, onMoveClick}:FolderCardProps) =
             <motion.div
                 initial={{opacity:0, y:10}}
                 animate={{opacity:1, y:0}}
+                onClick={handleClick}
                 onDoubleClick={handleDoubleClick}
                 className={cn(
                     'flex items-center gap-4 px-4 py-3 rounded-lg cursor-pointer transition-colors border border-transparent group hover:bg-primary/10',

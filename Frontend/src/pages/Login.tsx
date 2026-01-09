@@ -1,0 +1,112 @@
+import { useState } from "react"
+import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import { Eye, EyeOff, Lock, Mail, Scale } from "lucide-react";
+import { Label } from "../components/ui/label";
+import { Input } from "../components/ui/input";
+import { Button } from "../components/ui/button";
+
+const Login = () => {
+    const [email, setEmail] = useState<string>('');
+    const [password, setPassword] = useState<string>('');
+    const [showPassword, setShowPassword] = useState<boolean>(false);
+    const navigate = useNavigate();
+    
+    const handleLogin = (e:React.FormEvent) => {
+        e.preventDefault();
+        navigate('/');
+    }
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 flex items-center justify-center p-4">
+        <motion.div
+            initial={{opacity:0, y:20}}
+            animate={{opacity:1, y:0}}
+            transition={{duration:0.5}}
+            className="w-full max-w-md"
+        >
+            {/* Logo & Title */}
+            <div className="text-center mb-8">
+                <motion.div
+                    initial={{scale:0.8}}
+                    animate={{scale:1}}
+                    transition={{delay:0.2, type:'spring', stiffness:200}}
+                    className="inline-flex items-center justify-center w-16 h-16 bg-primary rounded-2xl mb-4"
+                >
+                    <Scale className="h-8 w-8 text-primary-foreground"/>
+                </motion.div>
+                <h1 className="text-3xl font-bold text-foreground mb-2">LawVault</h1>
+                <p className="text-muted-foreground">Secure document management for legal professionals</p>
+            </div>
+
+            {/* Login Card */}
+            <motion.div
+                initial={{opacity:0, y:20}}
+                animate={{opacity:1, y:0}}
+                transition={{delay:0.3, duration:0.5}}
+                className="bg-card border border-border rounded-2xl p-8 shadow-lg"
+            >
+                <h2 className="text-xl font-semibold text-foreground mb-6">Sign in to your account</h2>
+
+                <form onSubmit={handleLogin} className="space-y-5">
+                    {/* Email Field */}
+                    <div className="space-y-2">
+                        <Label htmlFor='email'>Email address</Label>
+                        <div className="relative">
+                            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground"/>
+                            <Input
+                                id="email"
+                                type="email"
+                                placeholder="you@lawvault.com"
+                                value={email}
+                                onChange={(e)=>setEmail(e.target.value)}
+                                className="pl-10"
+                            />
+                        </div>
+                    </div>
+
+                    {/* Password */}
+                    <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                            <Label htmlFor="password">Password</Label>
+                        </div>
+                        <div className="relative">
+                            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground"/>
+                            <Input
+                                id="password"
+                                type={showPassword?'text':'password'}
+                                placeholder="••••••••"
+                                value={password}
+                                onChange={(e)=>setPassword(e.target.value)}
+                                className="pl-10 pr-10"
+                            />
+                            <button
+                                type="button"
+                                onClick={()=>setShowPassword(!showPassword)}
+                                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                            >
+                                {showPassword? <EyeOff className="h-4 w-4"/> : <Eye className="h-4 w-4"/>}
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Submit Button */}
+                    <Button type="submit" className="w-full" size='lg'>
+                        Sign in
+                    </Button>
+                </form>
+
+                {/* Contact Admin */}
+                <p className="text-center text-sm text-muted-foreground mt-6">
+                    Don't have an account?{' '}
+                    <span className="text-primary hover:underline font-medium">Contact admin</span>
+
+                </p>
+
+            </motion.div>
+
+        </motion.div>
+    </div>
+  )
+}
+
+export default Login
