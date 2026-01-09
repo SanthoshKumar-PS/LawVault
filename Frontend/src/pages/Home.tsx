@@ -8,6 +8,8 @@ import { Button } from "../components/ui/button";
 import { X } from "lucide-react";
 import AppSideBar from "../components/layout/AppSideBar";
 import Toolbar from "../components/files/Toolbar";
+import FileGrid from "../components/files/FileGrid";
+import NewItemModal from "../components/modals/NewItemModal";
 
 const FileManagerContent = () => {
   const [sideBarOpen,setSideBarOpen] = useState<boolean>(false);
@@ -133,12 +135,15 @@ const FileManagerContent = () => {
             transition={{duration:0.3}}
           >
             <Toolbar onMoveClick={handleMoveClick}/>
+            <FileGrid onMoveClick={handleMoveClick}/>
 
           </motion.div>
 
         </main>
 
       </div>
+
+
     </div>
   )
 }

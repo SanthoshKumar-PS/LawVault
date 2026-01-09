@@ -42,6 +42,7 @@
 
   /* File type colors mapping */
   --color-file-document: hsl(var(--file-document));
+  --color-file-pdf: hsl(var(--file-pdf));
   --color-file-image: hsl(var(--file-image));
   --color-file-video: hsl(var(--file-video));
   --color-file-audio: hsl(var(--file-audio));
@@ -88,6 +89,7 @@
     --radius: 0.75rem;
 
     --file-document: 217 91% 60%;
+    --file-pdf: 0 91% 60%;
     --file-image: 142 76% 36%;
     --file-video: 0 84% 60%;
     --file-audio: 280 67% 60%;

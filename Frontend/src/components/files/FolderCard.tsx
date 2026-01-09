@@ -93,9 +93,6 @@ const FolderCard = ({folder, viewMode, onRename, onMoveClick}:FolderCardProps) =
 
         </motion.div>
     )
-  return (
-    <div>FolderCard</div>
-  )
 }
 
 export default FolderCard

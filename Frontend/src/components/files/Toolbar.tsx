@@ -1,4 +1,4 @@
-import { ChevronRight, Download, Move, Trash2 } from "lucide-react";
+import { ChevronRight, Download, Grid, LayoutGrid, List, Move, Trash2 } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
 import { useFileManager } from "../../contexts/FileManagerContext";
 import { 
@@ -11,6 +11,9 @@ import {
 } from "../ui/breadcrumb";
 import {motion} from 'framer-motion';
 import { Button } from "../ui/button";
+import { ToggleGroup, ToggleGroupItem } from "../ui/toggle-group";
+import type { ViewMode } from "../../types/TableTypes";
+import { cn } from "../../lib/utils";
 
 type ToolbarProps = {
     onMoveClick: (ids:string[], names:string[]) => void;
@@ -94,6 +97,49 @@ const Toolbar = ({onMoveClick}:ToolbarProps) => {
 
                 </motion.div>
             )}
+
+            {/* View Toggle */}
+            <ToggleGroup 
+                type="single"
+                value={viewMode}
+                onValueChange={(value)=>value&& setViewMode(value as ViewMode)}
+                className="bg-secondary/50 rounded-lg p-1"
+            >
+                <ToggleGroupItem
+                    value="grid"
+                    aria-label="Grid View"
+                    className={cn(
+                        'h-8 w-8 p-0',
+                        viewMode === 'grid' && 'bg-card shadow-md'
+                    )}
+                >
+                    <Grid className="h-4 w-4"/>
+                </ToggleGroupItem>
+
+                <ToggleGroupItem
+                    value="large-grid"
+                    aria-label="Large grid view"
+                    className={cn(
+                        'h-8 w-8 p-0',
+                        viewMode === 'large-grid' && 'bg-card shadow-md'
+                    )}
+                >
+                    <LayoutGrid className="h-4 w-4"/>
+                </ToggleGroupItem>
+  
+                <ToggleGroupItem
+                    value="list"
+                    aria-label="List View"
+                    className={cn(
+                        'h-8 w-8 p-0',
+                        viewMode === 'list' && 'bg-card shadow-md'
+                    )}
+                >
+                    <List className="h-4 w-4"/>
+                </ToggleGroupItem>
+
+            </ToggleGroup>
+
 
         </div>
 

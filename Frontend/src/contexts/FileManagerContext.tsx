@@ -29,7 +29,7 @@ export const FileManagerProvider = ({children}:{children: ReactNode}) => {
     const [files, setFiles] = useState<FileItem[]>(mockFiles);
     const [folders, setFolders] = useState<FolderItem[]>(mockFolders);
     const [currentFolderId, setCurrentFolderId] = useState<string|null>(null);
-    const [viewMode, setViewMode] = useState<ViewMode>('large-grid');
+    const [viewMode, setViewMode] = useState<ViewMode>('list');
     const [selectedItems, setSelectedItems] = useState<string[]>([]);
     const [searchQuery, setSearchQuery] = useState('') 
 
