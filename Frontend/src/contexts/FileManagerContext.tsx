@@ -18,6 +18,8 @@ type FileManagerContextType = {
     deleteItems:(ids:string[]) => void;
     renameFolder:(id:string, newName:string) => void;
     moveItems:(ids:string[], targetFolderId:string|null) => void;
+    searchQuery: string;
+    setSearchQuery: (query: string) => void;
 }
 
 
@@ -27,9 +29,9 @@ export const FileManagerProvider = ({children}:{children: ReactNode}) => {
     const [files, setFiles] = useState<FileItem[]>(mockFiles);
     const [folders, setFolders] = useState<FolderItem[]>(mockFolders);
     const [currentFolderId, setCurrentFolderId] = useState<string|null>(null);
-    const [viewMode, setViewMode] = useState<ViewMode>('grid');
+    const [viewMode, setViewMode] = useState<ViewMode>('large-grid');
     const [selectedItems, setSelectedItems] = useState<string[]>([]);
-    // const [searchQuery, setSearchQuery] = useState('') 
+    const [searchQuery, setSearchQuery] = useState('') 
 
     const getBreadCrumbs = (folderId:string|null):BreadcrumbItem[] => {
         const crumbs: BreadcrumbItem[] = [{id:null, name:'My Files'}];
@@ -123,7 +125,9 @@ export const FileManagerProvider = ({children}:{children: ReactNode}) => {
                 addFolder,
                 deleteItems,
                 renameFolder,
-                moveItems
+                moveItems,
+                searchQuery,
+                setSearchQuery
             }}
         >
             {children}
