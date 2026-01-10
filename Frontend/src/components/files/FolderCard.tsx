@@ -11,8 +11,8 @@ import FolderActions from "./FolderActions";
 type FolderCardProps = {
     folder:FolderItem;
     viewMode : ViewMode;
-    onRename?: (id:string) => void;
-    onMoveClick?: (ids:string[],names:string[]) => void;
+    onRename?: (id:number) => void;
+    onMoveClick?: (ids:number[],names:string[]) => void;
 }
 const FolderCard = ({folder, viewMode, onRename, onMoveClick}:FolderCardProps) => {
     const { hasPermission } = useAuth();
@@ -44,10 +44,10 @@ const FolderCard = ({folder, viewMode, onRename, onMoveClick}:FolderCardProps) =
                     <p className="font-medium text-sm truncate">{folder.name}</p>
                 </div>
                 <p className="text-xs text-muted-foreground hidden sm:block w-24">
-                    {format(folder.modifiedAt, 'MMM d, yyyy')}
+                    {format(folder.updatedAt, 'MMM d, yyyy')}
                 </p>
                 <p className="text-xs text-muted-foreground hidden md:block w-20 text-right">
-                    {folder.itemCount} items
+                    {folder.children.length} items
                 </p>
                 <FolderActions folder={folder} onRename={onRename} onMoveClick={onMoveClick}/>
 
@@ -86,7 +86,7 @@ const FolderCard = ({folder, viewMode, onRename, onMoveClick}:FolderCardProps) =
                 <div className="min-w-0 flex-1">
                     <p className="font-medium text-sm truncate">{folder.name}</p>
                     <p className="text-xs text-muted-foreground mt-0.5">
-                        {folder.itemCount} items
+                        {folder.children.length} items
                     </p>
                 </div>
                 <FolderActions folder={folder} onRename={onRename} onMoveClick={onMoveClick}/>

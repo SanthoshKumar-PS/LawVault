@@ -1,6 +1,5 @@
 import { useRef, useState } from "react"
 import Header from "../components/layout/Header"
-import { AuthProvider } from "../contexts/AuthContext";
 import { FileManagerProvider, useFileManager } from "../contexts/FileManagerContext";
 import type { UploadingFile } from "../components/uploads/UploadProgress";
 import { AnimatePresence, motion} from "framer-motion";
@@ -16,12 +15,12 @@ const FileManagerContent = () => {
   const [newItemModalOpen, setNewItemModalOpen] = useState<boolean>(false);
   const [manageUsersModalOpen, setManageUsersModalOpen] = useState<boolean>(false);
   const [moveModalOpen, setMoveModalOpen] = useState<boolean>(false);
-  const [moveItemIds, setMoveItemIds] = useState<string[]>([]);
+  const [moveItemIds, setMoveItemIds] = useState<number[]>([]);
   const [moveItemNames, setMoveItemNames] = useState<string[]>([]);
   const [uploadingFiles, setUploadingFiles] = useState<UploadingFile[]>([])
 
 
-  const {addFile, currentFolderId} = useFileManager();
+  // const {addFile, currentFolderId} = useFileManager();
   // const intervalsRef = useRef<Map<string, NodeJS.Timeout>>(new Map());
 
   // // Cleanup intervals on unmount
@@ -31,7 +30,7 @@ const FileManagerContent = () => {
   //   };
   // }, []);
   
-  const handleMoveClick = (ids:string[], names:string[]) => {
+  const handleMoveClick = (ids:number[], names:string[]) => {
     setMoveItemIds(ids);
     setMoveItemNames(names);
     setMoveModalOpen(true);
@@ -156,11 +155,9 @@ const FileManagerContent = () => {
 
 const Home = () => {
   return (
-    <AuthProvider>
       <FileManagerProvider>
         <FileManagerContent/>
       </FileManagerProvider>
-    </AuthProvider>
   )
 }
 

@@ -12,7 +12,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, DropdownMenuIte
 type FileCardProps = {
     file: FileItem;
     viewMode: ViewMode;
-    onMoveClick?: (ids:string[], names:string[]) => void;
+    onMoveClick?: (ids:number[], names:string[]) => void;
 }
 
 function formatFileSize(bytes?:number) :string {
@@ -48,12 +48,12 @@ const FileCard = ({ file, viewMode, onMoveClick }:FileCardProps) => {
                     isSelected && 'bg-primary/50 border-primary/20'
                 )}
             >
-                <FileIcon type={file.type} extension={file.extension} size='md'/>
+                <FileIcon file={file} size='md'/>
                 <div className='flex-1 min-w-0'>
                     <p className='font-medium text-sm truncate'>{file.name}</p>
                 </div>
                 <p className='text-xs text-muted-foreground hidden sm:block w-24'>
-                    {format(file.modifiedAt, 'MMM d,yyyy')}
+                    {format(file.updatedAt, 'MMM d,yyyy')}
                 </p>
                 <p className='text-xs text-muted-foreground hidden md:block w-20 text-right'>
                     {formatFileSize(file.size)}
@@ -83,7 +83,7 @@ const FileCard = ({ file, viewMode, onMoveClick }:FileCardProps) => {
                 'flex items-center justify-center rounded-lg bg-secondary/50 mb-3',
                 isLarge? 'h-32 w-full':'h-20 w-full'
             )}>
-                <FileIcon type={file.type} extension={file.extension} size={isLarge?'xl':'lg'}/>
+                <FileIcon file={file} size={isLarge?'xl':'lg'}/>
             </div>
 
             {/* Infor */}
@@ -91,7 +91,7 @@ const FileCard = ({ file, viewMode, onMoveClick }:FileCardProps) => {
                 <div className='min-w-0 flex-1'>
                     <p className='font-medium text-sm truncate'>{file.name}</p>
                     <p className='text-xs text-muted-foreground mt-0.5'>
-                        {formatFileSize(file.size)} • {format(file.modifiedAt, 'MMM d')} 
+                        {formatFileSize(file.size)} • {format(file.updatedAt, 'MMM d')} 
                     </p>
                 </div>
                 <FileActions file={file} onMoveClick={onMoveClick}/>
@@ -106,7 +106,7 @@ export default FileCard
 
 type FileActionsProps ={
     file:FileItem,
-    onMoveClick?:(ids:string[], names:string[]) => void;
+    onMoveClick?:(ids:number[], names:string[]) => void;
 }
 function FileActions({file, onMoveClick}:FileActionsProps){
     const { hasPermission } = useAuth();
@@ -159,7 +159,7 @@ function FileActions({file, onMoveClick}:FileActionsProps){
                 <div className="h-px bg-border my-1" />
 
                 {/* Delete */}
-                {hasPermission('delete_folder') && (
+                {hasPermission('create_folder') && (
                     <DropdownMenuItem
                     className="flex items-center px-3 py-2 text-sm rounded-lg cursor-pointer text-destructive focus:bg-destructive/10 focus:text-destructive outline-none transition-colors"
                     onClick={(e) => {

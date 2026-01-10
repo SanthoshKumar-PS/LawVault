@@ -16,7 +16,7 @@ import type { ViewMode } from "../../types/TableTypes";
 import { cn } from "../../lib/utils";
 
 type ToolbarProps = {
-    onMoveClick: (ids:string[], names:string[]) => void;
+    onMoveClick: (ids:number[], names:string[]) => void;
 }
 const Toolbar = ({onMoveClick}:ToolbarProps) => {
     const {viewMode, setViewMode, breadcrumps, setCurrentFolder, selectedItems, deleteItems, files, folders} = useFileManager();

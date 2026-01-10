@@ -13,8 +13,8 @@ import { MoreVertical, Move, Pencil, Star, Trash2 } from "lucide-react";
 
 type FolderActionsType = {
     folder: FolderItem;
-    onRename?: (id:string)=>void;
-    onMoveClick?:(ids:string[],names:string[])=>void;
+    onRename?: (id:number)=>void;
+    onMoveClick?:(ids:number[],names:string[])=>void;
 }
 const FolderActions = ({folder, onRename, onMoveClick}:FolderActionsType) => {
     const { hasPermission } = useAuth();

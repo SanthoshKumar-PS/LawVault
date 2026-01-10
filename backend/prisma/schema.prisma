@@ -24,7 +24,7 @@ model User{
 
   permissions Permissions?
   folders Folder[]
-  files Files[]
+  files File[]
 }
 
 model Permissions{
@@ -53,7 +53,7 @@ model Folder{
   
   createdBy Int
   creator User @relation(fields: [createdBy], references: [id])
-  files Files[]
+  files File[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -61,7 +61,7 @@ model Folder{
   @@index([parentId])
 }
 
-model Files{
+model File{
   id Int @id @default(autoincrement())
   name String
   s3Key String @unique

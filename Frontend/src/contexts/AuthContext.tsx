@@ -1,11 +1,11 @@
 import { createContext, useContext, useState, type ReactNode } from "react";
-import type { Permission, User, UserRole } from "../types/TableTypes"
+import type { PermissionOption, Permissions, User, UserRole } from "../types/TableTypes"
 import { adminUser, regularUser } from "../mockData";
 
 type AuthContextType = {
     currentUser: User;
     setUserRole:(role:UserRole) => void;
-    hasPermission: (permission:Permission) => boolean;
+    hasPermission: (permission:PermissionOption) => boolean;
     isAdmin:boolean;    
 }
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -14,15 +14,16 @@ export const AuthProvider = ({children}:{children:ReactNode}) => {
   const [currentUser, setCurrentUser] = useState<User>(adminUser);
   
   const setUserRole = (role:UserRole) => {
-    setCurrentUser(role==='admin'?adminUser:regularUser);
+    setCurrentUser(role==='ADMIN'?adminUser:regularUser);
   }
 
-  const hasPermission = (permission:Permission):boolean => {
-    if(currentUser.role==='admin') return true;
-    return currentUser.permissions.includes(permission);
+  const hasPermission = (permission:PermissionOption):boolean => {
+    if(!currentUser) return false
+    if(currentUser.role==='ADMIN') return true;
+    return !!currentUser.permissions[permission];
   }
 
-  const isAdmin = currentUser.role==='admin';
+  const isAdmin = currentUser.role==='ADMIN';
 
   return (
     <AuthContext.Provider value={{currentUser, setUserRole,hasPermission,isAdmin }}>

@@ -1,14 +1,26 @@
-export type UserRole = 'admin' | 'user';
+export type UserRole = 'ADMIN' | 'USER';
 
-export type Permission = 'upload' | 'download' | 'view' | 'move' | 'delete' | 'create_folder' | 'edit_folder' | 'delete_folder'
+export type PermissionOption = 'upload' | 'download' | 'view' | 'move' | 'delete' | 'create_folder' | 'edit_folder' | 'delete_folder'
+export type Permissions = {
+    id:number;
+    userId:number;
+    view:boolean;
+    upload:boolean;
+    download:boolean;
+    delete:boolean;
+    create_folder:boolean;
+    edit_folder:boolean;
+    delete_folder:boolean;
+    move:boolean;
+}
 
 export type User = {
     id:string;
-    name:string;
     email:string;
+    name:string;
     role:UserRole;
-    permissions:Permission[];
-    avatar?:string;
+    permissions:Permissions;
+    files:FileItem[]
 }
 
 export type FileType = 'document' | 'pdf' | 'image' | 'video' | 'audio' | 'archive' | 'folder' | 'other';
@@ -16,31 +28,40 @@ export type FileType = 'document' | 'pdf' | 'image' | 'video' | 'audio' | 'archi
 export type ViewMode = 'grid' | 'list' | 'large-grid';
 
 
-export type FileItem = {
-    id:string;
-    name:string;
-    type:FileType;
-    size?:number;
-    modifiedAt:Date;
-    createdAt:Date;
-    parentId: string | null;
-    ownerId: string | null;
-    extension?:string;
-    thumbnailUrl?:string;
+export type FolderItem = {
+  id: number;
+  name: string;
+  parentId?:number;
+  parent?: FolderItem;
+  children: FolderItem[]
+  
+  createdBy: number;
+  creator: User;
+  files: FileItem[]
+
+  createdAt: Date;
+  updatedAt: Date;
 }
 
-export type FolderItem = {
-    id:string;
-    name:string;
-    type:'folder';
-    modifiedAt: Date;
-    createdAt: Date;
-    parentId: string|null;
-    ownerId: string;
-    itemCount: number;
+export type FileItem = {
+  id: number;
+  name:string;
+  s3Key: string
+  size:number
+  mimeType:string
+
+  createdBy: number 
+  creator: User
+
+  folderId: number
+  folder: FolderItem
+
+  createdAt: Date
+  updatedAt: Date
 }
+
 
 export type BreadcrumbItem = {
-  id: string | null;
+  id: number | null;
   name: string;
 }

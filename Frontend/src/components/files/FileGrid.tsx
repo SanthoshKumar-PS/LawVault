@@ -5,13 +5,14 @@ import { cn } from "../../lib/utils";
 import FolderCard from "./FolderCard";
 import FileCard from "./FileCard";
 type FileGridProps = {
-    onMoveClick: (ids:string[], names:string[]) => void;
+    onMoveClick: (ids:number[], names:string[]) => void;
 }
 const FileGrid = ({onMoveClick}:FileGridProps) => {
     const {files, folders, currentFolderId, viewMode, searchQuery, clearSelection} = useFileManager();
-
+    console.log("Folders : ",folders)
     const currentFolders = folders.filter(f=> {
-        const inCurrentFolder = f.parentId === currentFolderId;
+        const inCurrentFolder = f.parentId === (currentFolderId??undefined);
+        console.log("inCurrentFolder: ",inCurrentFolder)
         const matchesSearch = searchQuery
             ? f.name.toLowerCase().includes(searchQuery.toLowerCase())
             :true;
@@ -19,7 +20,7 @@ const FileGrid = ({onMoveClick}:FileGridProps) => {
     })
 
     const currentFiles = files.filter(f=>{
-        const inCurrentFolder = f.parentId==currentFolderId;
+        const inCurrentFolder = f.folderId==currentFolderId;
         const matchesSearch = searchQuery
             ? f.name.toLowerCase().includes(searchQuery.toLowerCase())
             :true
