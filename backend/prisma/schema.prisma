@@ -1,0 +1,79 @@
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+enum UserRole {
+  ADMIN
+  USER
+}
+
+model User{
+  id Int @id @default(autoincrement())
+  email String @unique
+  password String
+  name String
+  role UserRole @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  permissions Permissions?
+  folders Folder[]
+  files Files[]
+}
+
+model Permissions{
+  id  Int @id @default(autoincrement())
+  userId Int @unique  
+  
+  view      Boolean      @default(true)
+  upload Boolean      @default(false)
+  download   Boolean      @default(false)
+  delete Boolean      @default(false)
+  create_folder    Boolean      @default(false)
+  edit_folder Boolean     @default(false)
+  delete_folder   Boolean     @default(false)
+  move Boolean @default(false)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+
+model Folder{
+  id Int @id @default(autoincrement())
+  name String
+  parentId Int?
+  parent Folder? @relation("FolderHierarchy", fields: [parentId], references: [id])
+  children Folder[] @relation("FolderHierarchy")
+  
+  createdBy Int
+  creator User @relation(fields: [createdBy], references: [id])
+  files Files[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([parentId])
+}
+
+model Files{
+  id Int @id @default(autoincrement())
+  name String
+  s3Key String @unique
+  size Int //Size in bytes
+  mimeType String
+
+  createdBy Int 
+  creator User @relation(fields: [createdBy], references: [id])
+
+  folderId Int
+  folder Folder @relation(fields: [folderId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
