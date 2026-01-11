@@ -4,7 +4,7 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@radix-ui/react-dropdown-menu";
+} from "../ui/dropdown-menu";
 import { Button } from "../ui/button";
 import type { FolderItem } from "../../types/TableTypes";
 import { useAuth } from "../../contexts/AuthContext";
@@ -30,7 +30,7 @@ const FolderActions = ({folder, onRename, onMoveClick}:FolderActionsType) => {
                 <MoreVertical className="h-4 w-4"/>
             </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-56 p-1 bg-popover border border-border rounded-xl shadow-xl animate-in fade-in-0 zoom-in-95"
+        <DropdownMenuContent align="end" className="w-[100] w-56 p-1 bg-popover border border-border rounded-xl shadow-xl animate-in fade-in-0 zoom-in-95"
         >
         {/* Add to Starred */}
         <DropdownMenuItem className="flex items-center px-3 py-2 text-sm rounded-lg cursor-pointer hover:bg-accent hover:text-accent-foreground outline-none transition-colors">

@@ -30,7 +30,7 @@ const AppSideBar = ({onNewClick, onManageUsersClick} : AppSideBarProps) => {
     const { setCurrentFolder, currentFolderId, folders } = useFileManager();
     const [foldersOpen, setFoldersOpen] = useState<boolean>(true);
 
-    const rootFolders = folders.filter(f=>f.parentId===null);
+    const rootFolders = folders.filter(f=>f.parentId===undefined);
     const usedStorage = 4.2;
     const totalStorage = 15;
     const storagePercentage = Math.ceil((usedStorage/totalStorage)*100);
@@ -87,7 +87,7 @@ const AppSideBar = ({onNewClick, onManageUsersClick} : AppSideBarProps) => {
                                 label={folder.name}
                                 active={currentFolderId===folder.id}
                                 onClick={()=>setCurrentFolder(folder.id)}
-                                badge={folder.itemCount}
+                                badge={folder.children.length}
                             />
                         ))}
                     </CollapsibleContent>
