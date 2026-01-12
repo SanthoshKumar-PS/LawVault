@@ -1,10 +1,13 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Eye, EyeOff, Lock, Mail, Scale } from "lucide-react";
 import { Label } from "../components/ui/label";
 import { Input } from "../components/ui/input";
 import { Button } from "../components/ui/button";
+import axios from 'axios'
+import { BACKEND_URL } from "../lib/config";
+import { toast } from "sonner";
 
 const Login = () => {
     const [email, setEmail] = useState<string>('');
@@ -12,10 +15,28 @@ const Login = () => {
     const [showPassword, setShowPassword] = useState<boolean>(false);
     const navigate = useNavigate();
     
-    const handleLogin = (e:React.FormEvent) => {
-        e.preventDefault();
-        navigate('/');
+    const handleLogin = async (e?:React.FormEvent) => {
+         e?.preventDefault();
+        //  if(!email) return toast.error('Enter valid email to login')
+        //  if(!password) return toast.error('Enter your password to login')
+        try{
+            const response = await axios.post(`${BACKEND_URL}/api/login`,{
+                email,
+                password   
+            })
+            console.log(response)
+
+        } catch(error:any){
+            console.log("Error occured while logging in")
+            toast.error('Internal Server Error',{
+                description:'Please try again later'
+            })
+        }
     }
+
+    useEffect(()=>{
+        handleLogin();
+    },[])
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 flex items-center justify-center p-4">
         <motion.div
