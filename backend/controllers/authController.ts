@@ -13,10 +13,10 @@ export const authController = async (req:Request, res:Response) => {
             }
         });
         if(!user){
-            return res.status(401).json({message:"User not found"})
+            return res.status(401).json({message:"Invalid email or password"})
         }
         if(password!==user.password){
-            return res.status(401).json({message:"Incorrect Password"});
+            return res.status(401).json({message:"Invalid email or password"});
         }
 
         const token = generateToken(user)
@@ -25,7 +25,6 @@ export const authController = async (req:Request, res:Response) => {
             message:"Login successfull",
             token:token,
             user:user
-
         })
 
         console.log(req.body)

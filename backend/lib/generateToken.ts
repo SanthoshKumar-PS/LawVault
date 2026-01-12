@@ -13,7 +13,8 @@ export const generateToken=(user:UserWithPermission) => {
             role:user.role,
             permission:user.permissions
         },
-        JWT_SECRET
+        JWT_SECRET,
+        {expiresIn:'7d'}
     );
 
     return token

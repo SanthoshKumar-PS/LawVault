@@ -8,29 +8,45 @@ import { Button } from "../components/ui/button";
 import axios from 'axios'
 import { BACKEND_URL } from "../lib/config";
 import { toast } from "sonner";
+import { useAuth } from "../contexts/AuthContext";
 
 const Login = () => {
-    const [email, setEmail] = useState<string>('');
-    const [password, setPassword] = useState<string>('');
+    const [email, setEmail] = useState<string>('santhosh@gmail.com');
+    const [password, setPassword] = useState<string>('Santhosh');
     const [showPassword, setShowPassword] = useState<boolean>(false);
+    const {currentUser,setCurrentUser} = useAuth();
     const navigate = useNavigate();
-    
+    useEffect(()=>{
+        console.log("Current User: ",currentUser)
+    },[currentUser])
     const handleLogin = async (e?:React.FormEvent) => {
          e?.preventDefault();
-        //  if(!email) return toast.error('Enter valid email to login')
-        //  if(!password) return toast.error('Enter your password to login')
+         if(!email) return toast.error('Enter valid email to login')
+         if(!password) return toast.error('Enter your password to login')
         try{
             const response = await axios.post(`${BACKEND_URL}/api/login`,{
                 email,
                 password   
-            })
-            console.log(response)
+            });
+            setCurrentUser(response.data.user)
+            localStorage.setItem('LAW_TOKEN',response.data.token)
+
+            console.log(response.data)
 
         } catch(error:any){
-            console.log("Error occured while logging in")
-            toast.error('Internal Server Error',{
-                description:'Please try again later'
-            })
+            console.error('Login error context: ',error);
+            const serverMessage = error.response?.data.message || error.response?.data;
+            const errorMessage = serverMessage || "Something went wrong"
+            if(error.response?.status===401){
+                toast.error('Unauthorized', {description:'Invalid email or password'})
+            }else if (error.response?.status === 409) {
+                toast.error("Conflict", { description: "User already exists" });
+            } else {
+                toast.error("Login Failed", { 
+                    description: errorMessage || "Please try again later" 
+                });
+            }
+
         }
     }
 
