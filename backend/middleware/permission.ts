@@ -1,8 +1,9 @@
 import { Permissions } from "@prisma/client"
-import { NextFunction, Request, Response } from "express"
+import { NextFunction, Response } from "express"
 import { prisma } from '../lib/prisma'
+import { AuthRequest } from "../lib/AuthRequest"
 export const requirePermission = (permission:keyof Permissions) => {
-    async (req:Request,res:Response, next:NextFunction)=>{
+    return async (req:AuthRequest,res:Response, next:NextFunction)=>{
         const userId = req.user?.id;
 
         const userPermissions = await prisma.permissions.findUnique({

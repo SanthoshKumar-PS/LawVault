@@ -71,8 +71,8 @@ model File{
   createdBy Int 
   creator User @relation(fields: [createdBy], references: [id])
 
-  folderId Int
-  folder Folder @relation(fields: [folderId], references: [id])
+  folderId Int?
+  folder Folder? @relation(fields: [folderId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt

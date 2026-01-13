@@ -1,31 +1,34 @@
-import { Folder } from "lucide-react";
+import { Folder, Loader2 } from "lucide-react";
 import { useFileManager } from "../../contexts/FileManagerContext";
 import { motion } from 'framer-motion';
 import { cn } from "../../lib/utils";
 import FolderCard from "./FolderCard";
 import FileCard from "./FileCard";
+import { LoadingSpinner } from "../layout/LoadingSpinner";
 type FileGridProps = {
     onMoveClick: (ids:number[], names:string[]) => void;
 }
 const FileGrid = ({onMoveClick}:FileGridProps) => {
-    const {files, folders, currentFolderId, viewMode, searchQuery, clearSelection} = useFileManager();
-    console.log("Folders : ",folders)
+    const {loading, files, folders, currentFolderId, viewMode, searchQuery, clearSelection} = useFileManager();
     const currentFolders = folders.filter(f=> {
-        const inCurrentFolder = f.parentId === (currentFolderId??undefined);
-        console.log("inCurrentFolder: ",inCurrentFolder)
         const matchesSearch = searchQuery
             ? f.name.toLowerCase().includes(searchQuery.toLowerCase())
             :true;
-        return inCurrentFolder && matchesSearch
+        return matchesSearch
     })
 
     const currentFiles = files.filter(f=>{
-        const inCurrentFolder = f.folderId==currentFolderId;
         const matchesSearch = searchQuery
             ? f.name.toLowerCase().includes(searchQuery.toLowerCase())
             :true
-        return inCurrentFolder && matchesSearch
+        return matchesSearch
     })
+
+    if(loading){
+        return (
+            <LoadingSpinner/>
+        )
+    }
 
     const isEmpty = currentFolders.length===0 && currentFiles.length===0
 

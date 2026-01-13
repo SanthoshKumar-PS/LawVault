@@ -1,15 +1,19 @@
-import { createContext, useContext, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import type { BreadcrumbItem, FileItem, FolderItem, ViewMode } from "../types/TableTypes"
 import { mockFiles, mockFolders } from "../mockData";
 import { useAuth } from "./AuthContext";
+import api from "../lib/api";
+import { toast } from "sonner";
 
 type FileManagerContextType = {
+    loading:boolean;
     files: FileItem[];
     folders: FolderItem[];
     currentFolderId: number|null;
     viewMode: ViewMode;
     selectedItems:number[];
     breadcrumps: BreadcrumbItem[];
+    setBreadcrumps:(breadcrumps:BreadcrumbItem[])=>void;
     setViewMode: (mode:ViewMode) => void;
     setCurrentFolder: (folderId:number|null) => void;
     selectItem :(id:number,multiSelect?:boolean) => void;
@@ -27,29 +31,74 @@ type FileManagerContextType = {
 const FileManagerContext = createContext<FileManagerContextType | undefined>(undefined);
 
 export const FileManagerProvider = ({children}:{children: ReactNode}) => {
-    const [files, setFiles] = useState<FileItem[]>(mockFiles);
-    const [folders, setFolders] = useState<FolderItem[]>(mockFolders);
+    const [loading,setLoading] = useState<boolean>(false);
+    const [files, setFiles] = useState<FileItem[]>([]);
+    const [folders, setFolders] = useState<FolderItem[]>([]);
+    const [breadcrumps, setBreadcrumps] = useState<BreadcrumbItem[]>([]);
     const [currentFolderId, setCurrentFolderId] = useState<number|null>(null);
     const [viewMode, setViewMode] = useState<ViewMode>('list');
     const [selectedItems, setSelectedItems] = useState<number[]>([]);
     const [searchQuery, setSearchQuery] = useState('') 
 
+    useEffect(()=>{
+        console.log("Chnage in folders: ",folders)
+    },[folders])
+    useEffect(()=>{
+        const fetchFoldersAndFiles = async () =>{
+            try {
+                setLoading(true);
+                const response = await api.get('/files',{
+                    params:{
+                        currentFolderId:currentFolderId
+                    }
+                });
+                console.log("Folders: ", response.data.folders)
+                setFolders(response.data.folders);
+                setFiles(response.data.files);
+                setBreadcrumps(response.data.breadcrumbs)
+                console.log("Axios response: ",response.data);
+            } catch (error:any) {
+                console.log('Error occured in fetchFoldersAndFiles: ',error)
+                const status = error.response?.status;
+                const serverMessage = error.response?.data.message || error.response?.data
+                const errorMessage = serverMessage || 'Something went wrong'
+                console.log("errorMessage: ",errorMessage);
+                switch(status){
+                    case 401:
+                        toast.error('Session expired',{
+                            description:'Please login again to continue.'
+                        });
+                        break;
+                    case 403:
+                        toast.error('Access Denied',{
+                            description:'You do not have permission to view this folder.'
+                        });
+                        break;
+                    case 404:
+                        toast.error('Not Found', {
+                            description: 'The requested folder does not exist.'
+                        });
+                        break;
+                    case 500:
+                        toast.error('Server Error', {
+                            description: 'Our legal vault is temporarily down. Try again later.' 
+                        });
+                        break;
+                    default:
+                        toast.error('Connection Error', { description: errorMessage });
+                }
+                
+            } finally{
+                setLoading(false);
+            }
+
+        }
+        
+        fetchFoldersAndFiles();
+    },[currentFolderId])
+
     const {currentUser} = useAuth();
 
-    const getBreadCrumbs = (folderId:number|null):BreadcrumbItem[] => {
-        const crumbs: BreadcrumbItem[] = [{id:null, name:'My Files'}];
-        let currentId = folderId;
-        while(currentId) {
-            const folder = folders.find(f=> f.id === currentId);
-            if(folder){
-                crumbs.splice(1,0,{id:folder.id,name:folder.name});
-                currentId=folder.parentId??null;
-            } else{
-                break;
-            }
-        }
-        return crumbs;
-    }
 
     const setCurrentFolder = (folderId:number | null) => {
         setCurrentFolderId(folderId);
@@ -78,21 +127,36 @@ export const FileManagerProvider = ({children}:{children: ReactNode}) => {
         setFiles(prev=>[...prev, newFile])
     }
 
-    const addFolder = (name:string) => {
-        const newFolder :FolderItem ={
-            id: Date.now(),
-        name,
-        parentId: currentFolderId??undefined,
-        parent: undefined, 
-        children: [],      
-        createdBy: 1,      
-        creator: currentUser!,
-        files: [],         
-        createdAt: new Date(),
-        updatedAt: new Date(),
+    const addFolder = async (name:string) => {
+        try{
+            setLoading(true);
+            const response = await api.post('/folder',{
+                folderName:name,
+                parentId:currentFolderId
+            });
+            console.log(response);
+        } catch(error){
+            console.log(error);
+
+        } finally{
+            setLoading(false);
         }
-        setFolders(prev => [...prev,newFolder])
     }
+    // const addFolder = (name:string) => {
+    //     const newFolder :FolderItem ={
+    //         id: Date.now(),
+    //     name,
+    //     parentId: currentFolderId??undefined,
+    //     parent: undefined, 
+    //     children: [],      
+    //     createdBy: 1,      
+    //     creator: currentUser!,
+    //     files: [],         
+    //     createdAt: new Date(),
+    //     updatedAt: new Date(),
+    //     }
+    //     setFolders(prev => [...prev,newFolder])
+    // }
 
     const deleteItems = (ids:number[]) => {
         setFiles(prev => prev.filter(f=>!ids.includes(f.id)));
@@ -116,12 +180,14 @@ export const FileManagerProvider = ({children}:{children: ReactNode}) => {
     return (
         <FileManagerContext.Provider
             value={{
+                loading,
                 files,
                 folders,
                 currentFolderId,
                 viewMode,
                 selectedItems,
-                breadcrumps:getBreadCrumbs(currentFolderId),
+                breadcrumps,
+                setBreadcrumps,
                 setViewMode,
                 setCurrentFolder,
                 selectItem,

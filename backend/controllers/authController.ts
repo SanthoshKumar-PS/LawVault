@@ -1,7 +1,8 @@
-import { Request, Response } from "express";
+import {  Response } from "express";
 import {prisma} from '../lib/prisma'
 import { generateToken } from '../lib/generateToken'
-export const authController = async (req:Request, res:Response) => {
+import { AuthRequest } from "../lib/AuthRequest";
+export const authController = async (req:AuthRequest, res:Response) => {
     try {
         const {email, password} = req.body;
         const user = await prisma.user.findUnique({
