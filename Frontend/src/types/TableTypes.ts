@@ -41,6 +41,10 @@ export type FolderItem = {
 
   createdAt: Date;
   updatedAt: Date;
+  _count?:{
+    files: number, 
+    children: number
+  }
 }
 
 export type FileItem = {

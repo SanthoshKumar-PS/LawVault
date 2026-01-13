@@ -18,6 +18,7 @@ const FolderCard = ({folder, viewMode, onRename, onMoveClick}:FolderCardProps) =
     const { hasPermission } = useAuth();
     const { selectItem, selectedItems, setCurrentFolder, deleteItems } = useFileManager();
     const isSelected = selectedItems.includes(folder.id);
+    const totalItems = (folder._count?.files || 0) + (folder._count?.children || 0) 
 
     const handleClick = (e:React.MouseEvent) => {
         e.stopPropagation();
@@ -47,7 +48,7 @@ const FolderCard = ({folder, viewMode, onRename, onMoveClick}:FolderCardProps) =
                     {format(folder.updatedAt, 'MMM d, yyyy')}
                 </p>
                 <p className="text-xs text-muted-foreground hidden md:block w-20 text-right">
-                    {folder.children.length} items
+                    {totalItems} items
                 </p>
                 <FolderActions folder={folder} onRename={onRename} onMoveClick={onMoveClick}/>
 
@@ -86,7 +87,7 @@ const FolderCard = ({folder, viewMode, onRename, onMoveClick}:FolderCardProps) =
                 <div className="min-w-0 flex-1">
                     <p className="font-medium text-sm truncate">{folder.name}</p>
                     <p className="text-xs text-muted-foreground mt-0.5">
-                        {folder.children.length} items
+                        {totalItems} items
                     </p>
                 </div>
                 <FolderActions folder={folder} onRename={onRename} onMoveClick={onMoveClick}/>

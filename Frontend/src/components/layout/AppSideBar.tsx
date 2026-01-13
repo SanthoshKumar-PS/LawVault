@@ -88,7 +88,7 @@ const AppSideBar = ({onNewClick, onManageUsersClick} : AppSideBarProps) => {
                                 label={folder.name}
                                 active={currentFolderId===folder.id}
                                 onClick={()=>setCurrentFolder(folder.id)}
-                                badge={folder.children.length}
+                                badge={(folder._count?.files||0)+(folder._count?.children||0)}
                             />
                         ))}
                     </CollapsibleContent>

@@ -11,8 +11,12 @@ export const getFilesAndFoldersById = async (req:AuthRequest, res:Response)=> {
                 parentId:currentFolderIdNo
             },
             include:{
-                files:true,
-                children:true
+                _count:{
+                    select:{
+                        files:true,
+                        children:true
+                    }
+                }
             }
         });
 
@@ -53,8 +57,26 @@ export const getFilesAndFoldersById = async (req:AuthRequest, res:Response)=> {
 
 export const createNewFolder = async (req:AuthRequest, res:Response) => {
     try {
-        const { folderfolderName, parentId } = req.body;
-        const parentIdNo = Number(parentId)
+        const { folderName, parentId } = req.body;
+        const parentIdNo = parentId? Number(parentId):null;
+
+        const newFolder = await prisma.folder.create({
+            data:{
+                name: folderName,
+                createdBy:req.user?.id!,
+                parentId:parentIdNo
+            },
+            include:{
+                _count:{
+                    select:{
+                        files:true,
+                        children:true
+                    }
+                }
+            }      
+        })
+
+        return res.status(200).json({message:'New Folder Created', newFolder});
     } catch (error:any) {
         console.log("Internal Server Error: ",error);
         return res.status(500).json({message:'Internal Server Error'})

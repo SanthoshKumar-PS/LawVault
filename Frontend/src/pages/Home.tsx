@@ -9,6 +9,7 @@ import AppSideBar from "../components/layout/AppSideBar";
 import Toolbar from "../components/files/Toolbar";
 import FileGrid from "../components/files/FileGrid";
 import NewItemModal from "../components/modals/NewItemModal";
+import MoveToModal from "../components/modals/MoveToModal";
 
 const Home = () => {
   return (
@@ -149,6 +150,14 @@ const FileManagerContent = () => {
         open={newItemModalOpen}
         onOpenChange={setNewItemModalOpen}
         onStartUpload={handleStartUpload}
+      />
+      
+      {/* Move To Modal */}
+      <MoveToModal
+        open={moveModalOpen}
+        onOpenChange={setMoveModalOpen}
+        itemsIds={moveItemIds}
+        itemsNames={moveItemNames}
       />
     </div>
   )

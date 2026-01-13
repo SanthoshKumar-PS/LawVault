@@ -134,7 +134,10 @@ export const FileManagerProvider = ({children}:{children: ReactNode}) => {
                 folderName:name,
                 parentId:currentFolderId
             });
-            console.log(response);
+            const newFolder = response.data.newFolder;
+
+            setFolders(prev=>[{...newFolder}, ...prev])
+            console.log("newFolder: ",newFolder);
         } catch(error){
             console.log(error);
 
