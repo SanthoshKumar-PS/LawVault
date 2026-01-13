@@ -86,7 +86,7 @@ export const FileManagerProvider = ({children}:{children: ReactNode}) => {
         parent: undefined, 
         children: [],      
         createdBy: 1,      
-        creator: currentUser,
+        creator: currentUser!,
         files: [],         
         createdAt: new Date(),
         updatedAt: new Date(),

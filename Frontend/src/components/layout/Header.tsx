@@ -2,10 +2,14 @@ import { Bell, HelpCircle, LogOut, Menu, Server, User } from "lucide-react";
 import { Button } from "../ui/button";
 import {motion} from 'framer-motion';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
 interface HeaderProps  {
   onMenuClick: ()=>void;
 }
 const Header = ({onMenuClick}:HeaderProps) => {
+  const navigate = useNavigate();
+  const { setCurrentUser } = useAuth();
   return (
     <header className="h-16 bg-card border-b border-border flex items-center justify-between px-4 gap-4">
       <div className="flex items-center gap-2">
@@ -69,7 +73,13 @@ const Header = ({onMenuClick}:HeaderProps) => {
 
             <DropdownMenuSeparator className="bg-border h-px my-1" />
             
-            <DropdownMenuItem className="flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer transition-colors focus:bg-destructive/10 focus:text-destructive text-destructive outline-none">
+            <DropdownMenuItem className="flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer transition-colors focus:bg-destructive/10 focus:text-destructive text-destructive outline-none"
+              onClick={()=>{
+                localStorage.clear();
+                setCurrentUser(null)
+                navigate('/');
+              }}
+            >
               <LogOut className="h-4 w-4"/>
               <span className="font-medium">Log out</span>
             </DropdownMenuItem>

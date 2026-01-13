@@ -10,6 +10,17 @@ import Toolbar from "../components/files/Toolbar";
 import FileGrid from "../components/files/FileGrid";
 import NewItemModal from "../components/modals/NewItemModal";
 
+const Home = () => {
+  return (
+      <FileManagerProvider>
+        <FileManagerContent/>
+      </FileManagerProvider>
+  )
+}
+
+export default Home;
+
+
 const FileManagerContent = () => {
   const [sideBarOpen,setSideBarOpen] = useState<boolean>(false);
   const [newItemModalOpen, setNewItemModalOpen] = useState<boolean>(false);
@@ -20,15 +31,6 @@ const FileManagerContent = () => {
   const [uploadingFiles, setUploadingFiles] = useState<UploadingFile[]>([])
 
 
-  // const {addFile, currentFolderId} = useFileManager();
-  // const intervalsRef = useRef<Map<string, NodeJS.Timeout>>(new Map());
-
-  // // Cleanup intervals on unmount
-  // useEffect(() => {
-  //   return () => {
-  //     intervalsRef.current.forEach(interval => clearInterval(interval));
-  //   };
-  // }, []);
   
   const handleMoveClick = (ids:number[], names:string[]) => {
     setMoveItemIds(ids);
@@ -153,12 +155,5 @@ const FileManagerContent = () => {
 }
 
 
-const Home = () => {
-  return (
-      <FileManagerProvider>
-        <FileManagerContent/>
-      </FileManagerProvider>
-  )
-}
 
-export default Home
+

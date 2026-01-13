@@ -5,10 +5,9 @@ import { Eye, EyeOff, Lock, Mail, Scale } from "lucide-react";
 import { Label } from "../components/ui/label";
 import { Input } from "../components/ui/input";
 import { Button } from "../components/ui/button";
-import axios from 'axios'
-import { BACKEND_URL } from "../lib/config";
 import { toast } from "sonner";
 import { useAuth } from "../contexts/AuthContext";
+import api from "../lib/api";
 
 const Login = () => {
     const [email, setEmail] = useState<string>('santhosh@gmail.com');
@@ -24,12 +23,13 @@ const Login = () => {
          if(!email) return toast.error('Enter valid email to login')
          if(!password) return toast.error('Enter your password to login')
         try{
-            const response = await axios.post(`${BACKEND_URL}/api/login`,{
+            const response = await api.post('/login',{
                 email,
-                password   
+                password
             });
             setCurrentUser(response.data.user)
             localStorage.setItem('LAW_TOKEN',response.data.token)
+            navigate('/home')
 
             console.log(response.data)
 
@@ -50,9 +50,6 @@ const Login = () => {
         }
     }
 
-    useEffect(()=>{
-        handleLogin();
-    },[])
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 flex items-center justify-center p-4">
         <motion.div
