@@ -28,16 +28,33 @@ export type FileType = 'document' | 'pdf' | 'image' | 'video' | 'audio' | 'archi
 export type ViewMode = 'grid' | 'list' | 'large-grid';
 
 
+export type FileItem = {
+  id: number;
+  name:string;
+  s3Key: string
+  size:number
+  mimeType:string
+
+  createdBy: number 
+  creator?: User
+
+  folderId: number | null
+  folder?: FolderItem
+
+  createdAt: Date
+  updatedAt: Date
+}
+
 export type FolderItem = {
   id: number;
   name: string;
   parentId?:number;
   parent?: FolderItem;
-  children: FolderItem[]
+  children?: FolderItem[]
   
   createdBy: number;
   creator: User;
-  files: FileItem[]
+  files?: FileItem[]
 
   createdAt: Date;
   updatedAt: Date;
@@ -47,22 +64,6 @@ export type FolderItem = {
   }
 }
 
-export type FileItem = {
-  id: number;
-  name:string;
-  s3Key: string
-  size:number
-  mimeType:string
-
-  createdBy: number 
-  creator: User
-
-  folderId: number
-  folder: FolderItem
-
-  createdAt: Date
-  updatedAt: Date
-}
 
 
 export type BreadcrumbItem = {

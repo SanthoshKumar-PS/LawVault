@@ -1,4 +1,4 @@
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import Header from "../components/layout/Header"
 import { FileManagerProvider, useFileManager } from "../contexts/FileManagerContext";
 import type { UploadingFile } from "../components/uploads/UploadProgress";
@@ -10,6 +10,8 @@ import Toolbar from "../components/files/Toolbar";
 import FileGrid from "../components/files/FileGrid";
 import NewItemModal from "../components/modals/NewItemModal";
 import MoveToModal from "../components/modals/MoveToModal";
+import { interval } from "date-fns";
+import UploadProgress from "../components/uploads/UploadProgress";
 
 const Home = () => {
   return (
@@ -29,9 +31,16 @@ const FileManagerContent = () => {
   const [moveModalOpen, setMoveModalOpen] = useState<boolean>(false);
   const [moveItemIds, setMoveItemIds] = useState<number[]>([]);
   const [moveItemNames, setMoveItemNames] = useState<string[]>([]);
-  const [uploadingFiles, setUploadingFiles] = useState<UploadingFile[]>([])
+  const [uploadingFiles, setUploadingFiles] = useState<UploadingFile[]>([]);
 
+  const { addFile, currentFolderId } = useFileManager();
+  const intervalsRef = useRef<Map<string, number>>(new Map());
 
+  useEffect(()=>{
+    return () => {
+      intervalsRef.current.forEach(interval => clearInterval(interval))
+    }
+  });
   
   const handleMoveClick = (ids:number[], names:string[]) => {
     setMoveItemIds(ids);
@@ -50,10 +59,72 @@ const FileManagerContent = () => {
     setUploadingFiles(prev=>[...prev,...newUploadingFiles]);
 
     newUploadingFiles.forEach(uploadFile => {
-      // simulateUpload((uploadFile))
+      simulateUpload((uploadFile))
       console.log("Uploading file id: ",uploadFile.id)
     })
   }
+
+  const simulateUpload = (uploadFile: UploadingFile) => {
+    // Simulate 2 minute upload (120 seconds)
+    const totalDuration = 120000;
+    const updateInterval = 500;
+    const totalUpdates = totalDuration / updateInterval;
+    const progressIncrement = 100 / totalUpdates;
+    
+    let currentProgress = 0;
+
+    const interval = setInterval(() => {
+      currentProgress += progressIncrement;
+      const jitter = (Math.random() - 0.5) * 0.5;
+      const newProgress = Math.min(100, currentProgress + jitter);
+
+      setUploadingFiles(prev => 
+        prev.map(f => 
+          f.id === uploadFile.id 
+            ? { ...f, progress: newProgress }
+            : f
+        )
+      );
+
+      if (currentProgress >= 100) {
+        clearInterval(interval);
+        intervalsRef.current.delete(uploadFile.id);
+        
+        // Mark as completed
+        setUploadingFiles(prev => 
+          prev.map(f => 
+            f.id === uploadFile.id 
+              ? { ...f, progress: 100, status: 'completed' }
+              : f
+          )
+        );
+
+        // Add file to the file manager
+        const extension = uploadFile.file.name.split('.').pop()?.toLowerCase() || '';
+        let type: 'document' | 'image' | 'video' | 'audio' | 'archive' | 'other' = 'other';
+        
+        if (['pdf', 'doc', 'docx', 'txt', 'pptx', 'xlsx'].includes(extension)) type = 'document';
+        else if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'].includes(extension)) type = 'image';
+        else if (['mp4', 'mov', 'avi', 'webm'].includes(extension)) type = 'video';
+        else if (['mp3', 'wav', 'ogg', 'm4a'].includes(extension)) type = 'audio';
+        else if (['zip', 'rar', '7z', 'tar'].includes(extension)) type = 'archive';
+                
+        addFile({
+            id: Date.now(), 
+            name: uploadFile.file.name,
+            size: uploadFile.file.size,
+            s3Key: 'pending...', 
+            mimeType: uploadFile.file.type,
+            createdBy: 5,
+            folderId: currentFolderId,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          });
+      }
+    }, updateInterval);
+
+    intervalsRef.current.set(uploadFile.id, interval);
+  };
 
   const handleUploadComplete = (completedFile : UploadingFile)=>{
     setUploadingFiles(prev =>
@@ -67,6 +138,16 @@ const FileManagerContent = () => {
 
   const handleClearCompleted = () => {
     setUploadingFiles(prev=> prev.filter(f => f.status !== 'completed'))
+  }
+
+  const handleCancelUpload = (uploadId:string) => {
+    const interval = intervalsRef.current.get(uploadId);
+    if(interval){
+      clearInterval(interval);
+      intervalsRef.current.delete(uploadId)
+    }
+
+    setUploadingFiles(prev => prev.filter(f  => f.id !== uploadId))
   }
 
   return (
@@ -159,6 +240,17 @@ const FileManagerContent = () => {
         itemsIds={moveItemIds}
         itemsNames={moveItemNames}
       />
+
+      <AnimatePresence>
+        {uploadingFiles.length>0 && (
+          <UploadProgress
+            uploads = {uploadingFiles}
+            onUploadComplete = {handleUploadComplete}
+            onClearCompleted = {handleClearCompleted}
+            onCancelUpload = {handleCancelUpload}
+          />
+        )}
+      </AnimatePresence>
     </div>
   )
 }
