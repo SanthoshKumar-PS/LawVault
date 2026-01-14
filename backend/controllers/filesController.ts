@@ -82,3 +82,19 @@ export const createNewFolder = async (req:AuthRequest, res:Response) => {
         return res.status(500).json({message:'Internal Server Error'})
     }
 }
+
+export const getRecentFoldersAndFiles = async (req:AuthRequest, res:Response) => {
+    try {
+        const files = await prisma.file.findMany({
+            take:20,
+            skip:0,
+            orderBy:{
+                createdAt: 'desc'
+            }
+        })
+    } catch (error:any) {
+        console.log("Error occured in getRecentFoldersAndFiles", error);
+        return res.status(500).json({message:'Internal Server Error'});
+        
+    }
+}
