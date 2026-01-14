@@ -54,7 +54,7 @@ export const getPreSignedUrl = async (req:AuthRequest, res:Response) => {
 export const completeUpload = async (req:AuthRequest, res:Response) => {
     try{
         const { fileName, uploadId, parts, metadata } = req.body;
-
+        console.log('Debug body: ', req.body)
         const command = new CompleteMultipartUploadCommand({
             Bucket:BUCKET,
             Key:fileName,
@@ -69,8 +69,8 @@ export const completeUpload = async (req:AuthRequest, res:Response) => {
                 name:metadata.name,
                 s3Key:fileName,
                 size:metadata.size,
-                mimeType:metadata.type,
-                createdBy:metadata.userId,
+                mimeType:metadata.mimeType,
+                createdBy:metadata.userId?Number(metadata.userId):1,
                 folderId:metadata.folderId || null
             }
         });
