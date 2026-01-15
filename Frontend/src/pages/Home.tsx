@@ -55,22 +55,6 @@ const FileManagerContent = () => {
     setMoveModalOpen(true);
   }
 
-  // const handleStartUpload = (files:File[]) => {
-  //   const newUploadingFiles : UploadingFile[] = files.map(file=>({
-  //     id:`upload-${Date.now()}-${Math.random().toString(36).substr(2,9)}`,
-  //     file,
-  //     progress:0,
-  //     status:'uploading' 
-  //   }))
-
-  //   setUploadingFiles(prev=>[...prev,...newUploadingFiles]);
-
-  //   newUploadingFiles.forEach(uploadFile => {
-  //     simulateUpload((uploadFile))
-  //     console.log("Uploading file id: ",uploadFile.id)
-  //   })
-  // }
-
   const handleStartUpload = (files:File[]) => {
     const newUploadingFiles : UploadingFile[] = files.map(file=>({
       id:`upload-${Date.now()}-${Math.random().toString(36).substr(2,9)}`,
@@ -86,68 +70,6 @@ const FileManagerContent = () => {
       console.log("Uploading file id: ",uploadFile.id)
     })
   }
-
-  // const simulateUpload = (uploadFile: UploadingFile) => {
-  //   // Simulate 2 minute upload (120 seconds)
-  //   const totalDuration = 120000;
-  //   const updateInterval = 500;
-  //   const totalUpdates = totalDuration / updateInterval;
-  //   const progressIncrement = 100 / totalUpdates;
-    
-  //   let currentProgress = 0;
-
-  //   const interval = setInterval(() => {
-  //     currentProgress += progressIncrement;
-  //     const jitter = (Math.random() - 0.5) * 0.5;
-  //     const newProgress = Math.min(100, currentProgress + jitter);
-
-  //     setUploadingFiles(prev => 
-  //       prev.map(f => 
-  //         f.id === uploadFile.id 
-  //           ? { ...f, progress: newProgress }
-  //           : f
-  //       )
-  //     );
-
-  //     if (currentProgress >= 100) {
-  //       clearInterval(interval);
-  //       intervalsRef.current.delete(uploadFile.id);
-        
-  //       // Mark as completed
-  //       setUploadingFiles(prev => 
-  //         prev.map(f => 
-  //           f.id === uploadFile.id 
-  //             ? { ...f, progress: 100, status: 'completed' }
-  //             : f
-  //         )
-  //       );
-
-  //       // Add file to the file manager
-  //       const extension = uploadFile.file.name.split('.').pop()?.toLowerCase() || '';
-  //       let type: 'document' | 'image' | 'video' | 'audio' | 'archive' | 'other' = 'other';
-        
-  //       if (['pdf', 'doc', 'docx', 'txt', 'pptx', 'xlsx'].includes(extension)) type = 'document';
-  //       else if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'].includes(extension)) type = 'image';
-  //       else if (['mp4', 'mov', 'avi', 'webm'].includes(extension)) type = 'video';
-  //       else if (['mp3', 'wav', 'ogg', 'm4a'].includes(extension)) type = 'audio';
-  //       else if (['zip', 'rar', '7z', 'tar'].includes(extension)) type = 'archive';
-                
-  //       addFile({
-  //           id: Date.now(), 
-  //           name: uploadFile.file.name,
-  //           size: uploadFile.file.size,
-  //           s3Key: 'pending...', 
-  //           mimeType: uploadFile.file.type,
-  //           createdBy: 5,
-  //           folderId: currentFolderId,
-  //           createdAt: new Date(),
-  //           updatedAt: new Date(),
-  //         });
-  //     }
-  //   }, updateInterval);
-
-  //   intervalsRef.current.set(uploadFile.id, interval);
-  // };
 
   const handleUploadComplete = (completedFile : UploadingFile)=>{
     setUploadingFiles(prev =>
@@ -165,13 +87,6 @@ const FileManagerContent = () => {
 
   const handleCancelUpload = (uploadId:string) => {
     console.log("Cancel upload was called");
-    // const interval = intervalsRef.current.get(uploadId);
-    // if(interval){
-    //   clearInterval(interval);
-    //   intervalsRef.current.delete(uploadId)
-    // }
-
-    // setUploadingFiles(prev => prev.filter(f  => f.id !== uploadId))
   }
 
   return (

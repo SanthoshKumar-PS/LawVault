@@ -8,6 +8,7 @@ import { FileIcon } from './FileIcon';
 import { format } from 'date-fns';
 import { Button } from '../ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, DropdownMenuItem, DropdownMenuSeparator } from '../ui/dropdown-menu';
+import api from '../../lib/api';
 
 type FileCardProps = {
     file: FileItem;
@@ -32,17 +33,28 @@ const FileCard = ({ file, viewMode, onMoveClick }:FileCardProps) => {
     const { selectItem, selectedItems, deleteItems } = useFileManager();
     const isSelected = selectedItems.includes(file.id);
 
-    const handleClick = (e:React.MouseEvent) => {
+    const handleClick = async (e:React.MouseEvent) => {
+        console.log("Click handle")
+        e.preventDefault();
         console.log("File id added:", file.id)
         selectItem(file.id, e.ctrlKey || e.metaKey);
     }
 
+    const handleFileOpen = async (s3Key:string)=>{
+        const { data } = await api.post('/getFileViewUrl',{
+            s3Key
+        });
+
+        window.open(data.url,'_blank');
+    }
+    
     if(viewMode === 'list'){
         return (
             <motion.div
                 initial={{opacity:0, y:10}}
                 animate={{opacity:1, y:0}}
                 onClick={handleClick}
+                onDoubleClick={()=>handleFileOpen(file.s3Key)}
                 className={cn(
                     'flex items-center gap-4 px-4 py-3 rounded-lg cursor-pointer transition-colors border border-transparent group hover:bg-primary/10',
                     isSelected && 'bg-primary/50 border-primary/20'
