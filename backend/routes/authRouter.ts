@@ -1,7 +1,8 @@
 import express from 'express'
 import { authController } from '../controllers/authController'
 import {getFilesAndFoldersById, createNewFolder} from '../controllers/filesController'
-import {completeUpload, getPreSignedUrl, initiateUpload} from '../controllers/uploadController'
+import {completeSingleUpload, completeUpload, getPreSignedUrl, getSinglePresignedUrl, initiateUpload} from '../controllers/uploadController'
+import {getFileViewUrl} from '../controllers/viewController'
 import {authenticate} from '../middleware/authenticate'
 import {requirePermission} from '../middleware/permission'
 export const authRouter = express.Router()
@@ -15,3 +16,9 @@ authRouter.get('/files',authenticate,requirePermission('view'),getFilesAndFolder
 authRouter.post('/initiateUpload',authenticate,requirePermission('upload'),initiateUpload)
 authRouter.post('/getPreSignedUrl',authenticate,requirePermission('upload'),getPreSignedUrl)
 authRouter.post('/completeUpload',authenticate,requirePermission('upload'),completeUpload)
+
+authRouter.post('/getSinglePresignedUrl',authenticate,requirePermission('upload'),getSinglePresignedUrl)
+authRouter.post('/completeSingleUpload',authenticate,requirePermission('upload'),completeSingleUpload)
+
+
+authRouter.post('/getFileViewUrl',authenticate,requirePermission('view'),getFileViewUrl)
