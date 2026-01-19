@@ -1,6 +1,5 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import type { BreadcrumbItem, FileItem, FolderItem, ViewMode } from "../types/TableTypes"
-import { mockFiles, mockFolders } from "../mockData";
 import { useAuth } from "./AuthContext";
 import api from "../lib/api";
 import { toast } from "sonner";

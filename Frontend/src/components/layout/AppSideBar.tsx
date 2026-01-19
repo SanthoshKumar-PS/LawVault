@@ -5,12 +5,8 @@ import {
   Trash2, 
   Cloud, 
   HardDrive,
-  Users,
-  Settings,
   Plus,
   ChevronDown,
-  ChevronsDown,
-  X
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useState, type ReactNode } from 'react';

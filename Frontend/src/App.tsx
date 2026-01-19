@@ -5,6 +5,9 @@ import Login from "./pages/Login"
 import { AuthProvider } from "./contexts/AuthContext"
 import ProtectedRoutes from "./pages/ProtectedRoutes"
 import { Toaster } from "sonner"
+import { FileManagerProvider } from "./contexts/FileManagerContext"
+import { FileActionProvider } from "./contexts/FileActionContext"
+import MainLayout from "./components/layout/MainLayout"
 const App = () => {
   return (
     <>
@@ -24,15 +27,22 @@ const App = () => {
       }}
     />
     <AuthProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route path ="/" element={<Login/>}/>
-          <Route path="/home" element={<ProtectedRoutes/>}>
-            <Route index element={<Home/>}/>
-          </Route>
-          <Route path ="/colors" element={<Colors/>}/>
-        </Routes>
-      </BrowserRouter>
+      <FileManagerProvider>
+        <FileActionProvider>
+          <BrowserRouter>
+            <Routes>
+              <Route path ="/" element={<Login/>}/>
+              <Route path="/home" element={<ProtectedRoutes/>}>
+                <Route element={<MainLayout/>}>
+                  <Route index element={<Home/>}/>
+                  <Route path ="colors" element={<Colors/>}/>
+                </Route>
+              </Route>
+              
+            </Routes>
+          </BrowserRouter>
+        </FileActionProvider>
+      </FileManagerProvider>
     </AuthProvider>
     </>
   )
