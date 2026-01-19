@@ -5,10 +5,8 @@ import { cn } from "../../lib/utils";
 import FolderCard from "./FolderCard";
 import FileCard from "./FileCard";
 import { LoadingSpinner } from "../layout/LoadingSpinner";
-type FileGridProps = {
-    onMoveClick: (ids:number[], names:string[]) => void;
-}
-const FileGrid = ({onMoveClick}:FileGridProps) => {
+
+const FileGrid = () => {
     const {loading, files, folders, currentFolderId, viewMode, searchQuery, clearSelection} = useFileManager();
     const currentFolders = folders.filter(f=> {
         const matchesSearch = searchQuery
@@ -85,7 +83,6 @@ const FileGrid = ({onMoveClick}:FileGridProps) => {
                             <FolderCard
                                 folder={folder}
                                 viewMode={viewMode}
-                                onMoveClick={onMoveClick}
                             />
 
                         </motion.div>
@@ -113,7 +110,6 @@ const FileGrid = ({onMoveClick}:FileGridProps) => {
                             <FileCard
                                 file={file}
                                 viewMode={viewMode}
-                                onMoveClick={onMoveClick}
                             />
                         </motion.div>
                     ))}

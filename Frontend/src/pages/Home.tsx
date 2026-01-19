@@ -1,10 +1,8 @@
 import { motion } from "framer-motion";
 import Toolbar from "../components/files/Toolbar";
 import FileGrid from "../components/files/FileGrid";
-import { useFileActions } from "../contexts/FileActionContext";
 
 const Home = () => {
-  const { handleMoveClick } = useFileActions();
 
   return (
     <motion.div
@@ -12,8 +10,8 @@ const Home = () => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
     >
-      <Toolbar onMoveClick={handleMoveClick} />
-      <FileGrid onMoveClick={handleMoveClick} />
+      <Toolbar />
+      <FileGrid />
     </motion.div>
   );
 };

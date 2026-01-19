@@ -10,8 +10,8 @@ import MoveToModal from "../../components/modals/MoveToModal";
 import UploadProgress from "../../components/uploads/UploadProgress";
 import { Button } from "../../components/ui/button";
 
-import { FileManagerProvider, useFileManager } from "../../contexts/FileManagerContext";
-import { FileActionProvider, useFileActions } from "../../contexts/FileActionContext";
+import { useFileManager } from "../../contexts/FileManagerContext";
+import { useFileActions } from "../../contexts/FileActionContext";
 
 const MainLayout = () => {
   const [sideBarOpen, setSideBarOpen] = useState(false);

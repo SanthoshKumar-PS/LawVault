@@ -14,12 +14,12 @@ import { Button } from "../ui/button";
 import { ToggleGroup, ToggleGroupItem } from "../ui/toggle-group";
 import type { ViewMode } from "../../types/TableTypes";
 import { cn } from "../../lib/utils";
+import { useFileActions } from "../../contexts/FileActionContext";
 
-type ToolbarProps = {
-    onMoveClick: (ids:number[], names:string[]) => void;
-}
-const Toolbar = ({onMoveClick}:ToolbarProps) => {
-    const {viewMode, setViewMode, breadcrumps, setCurrentFolder, selectedItems, deleteItems, files, folders} = useFileManager();
+
+const Toolbar = () => {
+    const {viewMode, setViewMode, breadcrumbs, setCurrentFolder, selectedItems, deleteItems, files, folders} = useFileManager();
+    const { handleMoveClick } = useFileActions();
     const {hasPermission} = useAuth();
 
     const getSelectedNames = () => {
@@ -37,7 +37,7 @@ const Toolbar = ({onMoveClick}:ToolbarProps) => {
         {/* Breadcrumb */}
         <Breadcrumb>
             <BreadcrumbList>
-                {breadcrumps.map((crump,index)=>(
+                {breadcrumbs.map((crump,index)=>(
                     <div key={crump.id??'root'} className="flex items-center">
                         {index>0 && (
                             <BreadcrumbSeparator>
@@ -78,7 +78,7 @@ const Toolbar = ({onMoveClick}:ToolbarProps) => {
                         <Button
                             variant='outline'
                             size='sm'
-                            onClick={()=> onMoveClick(selectedItems, getSelectedNames())}
+                            onClick={()=> handleMoveClick(selectedItems, getSelectedNames())}
                         >
                             <Move className="h-4 w-4 mr-1"/>
                             Move

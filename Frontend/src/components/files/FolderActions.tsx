@@ -10,15 +10,17 @@ import type { FolderItem } from "../../types/TableTypes";
 import { useAuth } from "../../contexts/AuthContext";
 import { useFileManager } from "../../contexts/FileManagerContext";
 import { MoreVertical, Move, Pencil, Star, Trash2 } from "lucide-react";
+import { useFileActions } from "../../contexts/FileActionContext";
 
 type FolderActionsType = {
     folder: FolderItem;
     onRename?: (id:number)=>void;
-    onMoveClick?:(ids:number[],names:string[])=>void;
 }
-const FolderActions = ({folder, onRename, onMoveClick}:FolderActionsType) => {
+const FolderActions = ({folder, onRename}:FolderActionsType) => {
     const { hasPermission } = useAuth();
     const { deleteItems } = useFileManager();
+    const { handleMoveClick } = useFileActions();
+
   return (
     <DropdownMenu>
         <DropdownMenuTrigger asChild onClick={(e)=>e.stopPropagation()}>
@@ -56,7 +58,7 @@ const FolderActions = ({folder, onRename, onMoveClick}:FolderActionsType) => {
             <DropdownMenuItem
             onClick={(e) => {
                 e.stopPropagation();
-                onMoveClick?.([folder.id], [folder.name]);
+                handleMoveClick?.([folder.id], [folder.name]);
             }}
             className="flex items-center px-3 py-2 text-sm rounded-lg cursor-pointer hover:bg-accent hover:text-accent-foreground outline-none transition-colors"
             >

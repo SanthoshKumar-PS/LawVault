@@ -12,9 +12,8 @@ type FolderCardProps = {
     folder:FolderItem;
     viewMode : ViewMode;
     onRename?: (id:number) => void;
-    onMoveClick?: (ids:number[],names:string[]) => void;
 }
-const FolderCard = ({folder, viewMode, onRename, onMoveClick}:FolderCardProps) => {
+const FolderCard = ({folder, viewMode, onRename}:FolderCardProps) => {
     const { hasPermission } = useAuth();
     const { selectItem, selectedItems, setCurrentFolder, deleteItems } = useFileManager();
     const isSelected = selectedItems.includes(folder.id);
@@ -50,7 +49,7 @@ const FolderCard = ({folder, viewMode, onRename, onMoveClick}:FolderCardProps) =
                 <p className="text-xs text-muted-foreground hidden md:block w-20 text-right">
                     {totalItems} items
                 </p>
-                <FolderActions folder={folder} onRename={onRename} onMoveClick={onMoveClick}/>
+                <FolderActions folder={folder} onRename={onRename} />
 
             </motion.div>
         )
@@ -90,7 +89,7 @@ const FolderCard = ({folder, viewMode, onRename, onMoveClick}:FolderCardProps) =
                         {totalItems} items
                     </p>
                 </div>
-                <FolderActions folder={folder} onRename={onRename} onMoveClick={onMoveClick}/>
+                <FolderActions folder={folder} onRename={onRename} />
             </div>
 
         </motion.div>

@@ -11,13 +11,12 @@ type FileManagerContextType = {
     currentFolderId: number|null;
     viewMode: ViewMode;
     selectedItems:number[];
-    breadcrumps: BreadcrumbItem[];
-    setBreadcrumps:(breadcrumps:BreadcrumbItem[])=>void;
+    breadcrumbs: BreadcrumbItem[];
+    setBreadcrumbs:(breadcrumbs:BreadcrumbItem[])=>void;
     setViewMode: (mode:ViewMode) => void;
     setCurrentFolder: (folderId:number|null) => void;
     selectItem :(id:number,multiSelect?:boolean) => void;
     clearSelection: ()=>void;
-    // addFile:(file: Omit<FileItem,'id' | 'createdAt'|'updatedAt'>) => void;
     addFile:(file: FileItem ) => void;
     addFolder:(name:string) => void;
     deleteItems:(ids:number[]) => void;
@@ -34,14 +33,14 @@ export const FileManagerProvider = ({children}:{children: ReactNode}) => {
     const [loading,setLoading] = useState<boolean>(false);
     const [files, setFiles] = useState<FileItem[]>([]);
     const [folders, setFolders] = useState<FolderItem[]>([]);
-    const [breadcrumps, setBreadcrumps] = useState<BreadcrumbItem[]>([]);
+    const [breadcrumbs, setBreadcrumbs] = useState<BreadcrumbItem[]>([]);
     const [currentFolderId, setCurrentFolderId] = useState<number|null>(null);
     const [viewMode, setViewMode] = useState<ViewMode>('list');
     const [selectedItems, setSelectedItems] = useState<number[]>([]);
     const [searchQuery, setSearchQuery] = useState('') 
 
     useEffect(()=>{
-        console.log("Chnage in folders: ",folders)
+        console.log("Change in folders: ",folders)
     },[folders])
     useEffect(()=>{
         const fetchFoldersAndFiles = async () =>{
@@ -55,7 +54,7 @@ export const FileManagerProvider = ({children}:{children: ReactNode}) => {
                 console.log("Folders: ", response.data.folders)
                 setFolders(response.data.folders);
                 setFiles(response.data.files);
-                setBreadcrumps(response.data.breadcrumbs)
+                setBreadcrumbs(response.data.breadcrumbs)
                 console.log("Axios response: ",response.data);
             } catch (error:any) {
                 console.log('Error occured in fetchFoldersAndFiles: ',error)
@@ -117,7 +116,7 @@ export const FileManagerProvider = ({children}:{children: ReactNode}) => {
 
     const clearSelection = () => setSelectedItems([]);
 
-    const addFile = (file:Omit<FileItem, 'id'|'createdAt'|'updatedAt'>) => {
+    const addFile = (file:FileItem) => {
         const newFile:FileItem = {
             ...file,
             id:Date.now(),
@@ -145,21 +144,6 @@ export const FileManagerProvider = ({children}:{children: ReactNode}) => {
             setLoading(false);
         }
     }
-    // const addFolder = (name:string) => {
-    //     const newFolder :FolderItem ={
-    //         id: Date.now(),
-    //     name,
-    //     parentId: currentFolderId??undefined,
-    //     parent: undefined, 
-    //     children: [],      
-    //     createdBy: 1,      
-    //     creator: currentUser!,
-    //     files: [],         
-    //     createdAt: new Date(),
-    //     updatedAt: new Date(),
-    //     }
-    //     setFolders(prev => [...prev,newFolder])
-    // }
 
     const deleteItems = (ids:number[]) => {
         setFiles(prev => prev.filter(f=>!ids.includes(f.id)));
@@ -189,8 +173,8 @@ export const FileManagerProvider = ({children}:{children: ReactNode}) => {
                 currentFolderId,
                 viewMode,
                 selectedItems,
-                breadcrumps,
-                setBreadcrumps,
+                breadcrumbs,
+                setBreadcrumbs,
                 setViewMode,
                 setCurrentFolder,
                 selectItem,

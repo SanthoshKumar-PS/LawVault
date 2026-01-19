@@ -9,11 +9,11 @@ import { format } from 'date-fns';
 import { Button } from '../ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, DropdownMenuItem, DropdownMenuSeparator } from '../ui/dropdown-menu';
 import api from '../../lib/api';
+import { useFileActions } from '../../contexts/FileActionContext';
 
 type FileCardProps = {
     file: FileItem;
     viewMode: ViewMode;
-    onMoveClick?: (ids:number[], names:string[]) => void;
 }
 
 function formatFileSize(bytes?:number) :string {
@@ -28,7 +28,7 @@ function formatFileSize(bytes?:number) :string {
     return `${size.toFixed(1)} ${units[unitIndex]}`
 }
 
-const FileCard = ({ file, viewMode, onMoveClick }:FileCardProps) => {
+const FileCard = ({ file, viewMode }:FileCardProps) => {
     const { hasPermission } = useAuth();
     const { selectItem, selectedItems, deleteItems } = useFileManager();
     const isSelected = selectedItems.includes(file.id);
@@ -70,7 +70,7 @@ const FileCard = ({ file, viewMode, onMoveClick }:FileCardProps) => {
                 <p className='text-xs text-muted-foreground hidden md:block w-20 text-right'>
                     {formatFileSize(file.size)}
                 </p>
-                <FileActions file={file} onMoveClick={onMoveClick}/>
+                <FileActions file={file}/>
 
             </motion.div>
         )
@@ -106,7 +106,7 @@ const FileCard = ({ file, viewMode, onMoveClick }:FileCardProps) => {
                         {formatFileSize(file.size)} • {format(file.updatedAt, 'MMM d')} 
                     </p>
                 </div>
-                <FileActions file={file} onMoveClick={onMoveClick}/>
+                <FileActions file={file}/>
 
             </div>
 
@@ -118,11 +118,12 @@ export default FileCard
 
 type FileActionsProps ={
     file:FileItem,
-    onMoveClick?:(ids:number[], names:string[]) => void;
 }
-function FileActions({file, onMoveClick}:FileActionsProps){
+function FileActions({file}:FileActionsProps){
     const { hasPermission } = useAuth();
     const { deleteItems } = useFileManager();
+    const { handleMoveClick } = useFileActions();
+
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild onClick={(e)=>e.stopPropagation()}>
@@ -158,7 +159,7 @@ function FileActions({file, onMoveClick}:FileActionsProps){
                     <DropdownMenuItem
                     onClick={(e) => {
                         e.stopPropagation();
-                        onMoveClick?.([file.id], [file.name]);
+                        handleMoveClick?.([file.id], [file.name]);
                     }}
                     className="flex items-center px-3 py-2 text-sm rounded-lg cursor-pointer hover:bg-accent hover:text-accent-foreground outline-none transition-colors"
                     >
