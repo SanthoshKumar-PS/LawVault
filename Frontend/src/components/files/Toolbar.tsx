@@ -22,15 +22,6 @@ const Toolbar = () => {
     const { handleMoveClick } = useFileActions();
     const {hasPermission} = useAuth();
 
-    const getSelectedNames = () => {
-        return selectedItems.map(id=>{
-            const file = files.find(f=>f.id===id);
-            if(file) return file.name;
-            const folder = folders.find(f=>f.id===id);
-            if(folder) return folder.name
-            return 'Unknown';
-        })
-    }
 
   return (
     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
@@ -78,7 +69,7 @@ const Toolbar = () => {
                         <Button
                             variant='outline'
                             size='sm'
-                            onClick={()=> handleMoveClick(selectedItems, getSelectedNames())}
+                            onClick={()=> handleMoveClick(selectedItems)}
                         >
                             <Move className="h-4 w-4 mr-1"/>
                             Move

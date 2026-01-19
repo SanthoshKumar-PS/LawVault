@@ -22,7 +22,7 @@ const MainLayout = () => {
   const { 
     uploadingFiles, handleStartUpload, handleUploadComplete, 
     handleClearCompleted, handleMoveClick, moveModalOpen, 
-    setMoveModalOpen, moveItemIds, moveItemNames 
+    setMoveModalOpen, moveItemIds 
   } = useFileActions();
 
   return (
@@ -80,7 +80,6 @@ const MainLayout = () => {
         open={moveModalOpen}
         onOpenChange={setMoveModalOpen}
         itemsIds={moveItemIds}
-        itemsNames={moveItemNames}
       />
 
       <AnimatePresence>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useFileManager } from "../../contexts/FileManagerContext";
 import {
   Dialog,
@@ -13,47 +13,83 @@ import { cn } from "../../lib/utils";
 import { ScrollArea } from "../ui/scroll-area";
 import {motion} from 'framer-motion';
 import { Button } from "../ui/button";
+import api from "../../lib/api";
+import { toast } from "sonner";
+import type { BreadcrumbItem, FolderItem } from "../../types/TableTypes";
 
 
 type MoveToModalProps = {
     open:boolean;
     onOpenChange: (open:boolean) => void;
     itemsIds:number[];
-    itemsNames:string[]
 }
 
 
-const MoveToModal = ({ open, onOpenChange, itemsIds, itemsNames }: MoveToModalProps) => {
-    const { folders, moveItems, currentFolderId } = useFileManager();
+const MoveToModal = ({ open, onOpenChange, itemsIds }: MoveToModalProps) => {
+    const { folders, moveItems, currentFolderId, moveLoading, setMoveLoading } = useFileManager();
     const [selectedFolderId, setSelectedFolderId] = useState<number|null>(null);
     const [navigatedFolderId, setNavigatedFolderId] = useState<number|null>(null);
+    const [currentFolders, setCurrentFolders] = useState<FolderItem[]>([]);
+    const [currentBreadcrumbs, setCurrentBreadcrumbs] = useState<BreadcrumbItem[]>([]);
 
-    const getAvailableFolders = (parentId:number|null) => {
-        return folders.filter(f =>
-            f.parentId === parentId && !itemsIds.includes(f.id)
-        )
+
+    const getAvailableFolders = async () =>{
+        try {
+            setMoveLoading(true);
+            const response = await api.get('/folderNamesById',{
+            params:{
+                navigatedFolderId:navigatedFolderId,
+                itemsIds: itemsIds
+                }
+            });
+            console.log("Navigated Folders: ", response.data.currentFolders)
+            setCurrentFolders(response.data.currentFolders);
+            setCurrentBreadcrumbs(response.data.currentBreadcrumbs)
+            console.log("Axios response: ",response.data);
+        } catch (error:any) {
+            console.log('Error occured in getAvailableFolders: ',error)
+            const status = error.response?.status;
+            const serverMessage = error.response?.data.message || error.response?.data
+            const errorMessage = serverMessage || 'Something went wrong'
+            console.log("errorMessage: ",errorMessage);
+            switch(status){
+                case 401:
+                    toast.error('Session expired',{
+                        description:'Please login again to continue.'
+                    });
+                    break;
+                case 403:
+                    toast.error('Access Denied',{
+                        description:'You do not have permission to view this folder.'
+                    });
+                    break;
+                case 404:
+                    toast.error('Not Found', {
+                        description: 'The requested folder does not exist.'
+                    });
+                    break;
+                case 500:
+                    toast.error('Server Error', {
+                        description: 'Our legal vault is temporarily down. Try again later.' 
+                    });
+                       break;
+                default:
+                    toast.error('Connection Error', { description: errorMessage });
+                }
+                
+        } finally{
+            setMoveLoading(false);
+        }
+
     }
 
-    const currentFolders = getAvailableFolders(navigatedFolderId);
 
-  const getBreadcrumbs = () => {
-    const crumbs: { id: number | null; name: string }[] = [{ id: null, name: 'My Files' }];
-    let currentId = navigatedFolderId;
-    
-    while (currentId) {
-      const folder = folders.find(f => f.id === currentId);
-      if (folder) {
-        crumbs.splice(1, 0, { id: folder.id, name: folder.name });
-        currentId = folder.parentId??null;
-      } else {
-        break;
-      }
+    useEffect(() => {
+    if (open) {
+        getAvailableFolders();
     }
-    
-    return crumbs;
-  };
+    }, [navigatedFolderId, open]);
 
-    const breadcrumbs = getBreadcrumbs();
 
     const handleMove = () => {
         moveItems(itemsIds, selectedFolderId);
@@ -76,14 +112,27 @@ const MoveToModal = ({ open, onOpenChange, itemsIds, itemsNames }: MoveToModalPr
     const selectFolder = (folderId:number|null) => {
         setSelectedFolderId(folderId);
     }
-    const isCurrentLocation = selectedFolderId === currentFolderId || 
-        (selectedFolderId === null && navigatedFolderId === null && currentFolderId === null);
 
-    const selectedFolderName = selectedFolderId
-        ? folders.find(f => f.id ===selectedFolderId)?.name
-        : navigatedFolderId
-            ? folders.find(f => f.id === navigatedFolderId)?.name
-            : 'My Files'
+    const selectedFolderName = (() => {
+    if (selectedFolderId !== null) {
+        return (
+        folders.find(f => f.id === selectedFolderId)?.name ||
+        currentFolders.find(f => f.id === selectedFolderId)?.name ||
+        'Selected Folder'
+        );
+    }
+
+    if (navigatedFolderId !== null) {
+        return (
+        folders.find(f => f.id === navigatedFolderId)?.name ||
+        currentBreadcrumbs.find(b => b.id === navigatedFolderId)?.name ||
+        'Current Folder'
+        );
+    }
+
+    return 'My Files';
+    })();
+
   return (
     <Dialog open={open} onOpenChange={handleClose}>
         <DialogContent className="sm:max-w-md">
@@ -93,14 +142,13 @@ const MoveToModal = ({ open, onOpenChange, itemsIds, itemsNames }: MoveToModalPr
                     Move {itemsIds.length} {itemsIds.length === 1 ? 'item':'items'}
                 </DialogTitle>
                 <DialogDescription>
-                    Select a destination folder for: {itemsNames.slice(0,2).join(',')}
-                    {itemsNames.length>2 && `and ${itemsNames.length-2} more`}
+                    Select a destination folder for the selected items.
                 </DialogDescription>
             </DialogHeader>
 
             {/* Breadcrumb Navigation */}
             <div className="flex items-center gap-1 text-sm overflow-x-auto py-2 px-1">
-                {breadcrumbs.map((crumb, index)=> (
+                {currentBreadcrumbs && currentBreadcrumbs.map((crumb, index)=> (
                     <div key={crumb.id??'root'} className="flex items-center">
                         {index>0 && <ChevronRight className="h-4 w-4 text-muted-foreground mx-1 flex-shrink-0"/>}
                         <button
@@ -147,7 +195,7 @@ const MoveToModal = ({ open, onOpenChange, itemsIds, itemsNames }: MoveToModalPr
 
             {/* Folder List */}
             <ScrollArea className="h-[250px] border rounded-lg">
-                {currentFolders.length===0 ? (
+                {currentFolders && currentFolders.length===0 ? (
                     <div className="flex flex-col items-center justify-center mb-2">
                         <Folder className="h-10 w-10 text-muted-foreground mb-2"/>
                         <p>No subfolders here</p>
@@ -197,9 +245,9 @@ const MoveToModal = ({ open, onOpenChange, itemsIds, itemsNames }: MoveToModalPr
                 </Button>
                 <Button
                     onClick={handleMove}
-                    disabled={selectedFolderId === currentFolderId}
+                    disabled={selectedFolderId === currentFolderId || moveLoading}
                 >
-                    Move to {selectedFolderName}
+                    Move to {selectedFolderName}    
                 </Button>
             </DialogFooter>
 

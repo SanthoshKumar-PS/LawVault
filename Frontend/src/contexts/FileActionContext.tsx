@@ -12,8 +12,7 @@ type FileActionContextType = {
   moveModalOpen: boolean;
   setMoveModalOpen: (open: boolean) => void;
   moveItemIds: number[];
-  moveItemNames: string[];
-  handleMoveClick: (ids: number[], names: string[]) => void;
+  handleMoveClick: (ids: number[]) => void;
 };
 
 const FileActionContext = createContext<FileActionContextType | undefined>(undefined);
@@ -24,7 +23,6 @@ export const FileActionProvider = ({ children }: { children: ReactNode }) => {
   const [uploadingFiles, setUploadingFiles] = useState<UploadingFile[]>([]);
   const [moveModalOpen, setMoveModalOpen] = useState(false);
   const [moveItemIds, setMoveItemIds] = useState<number[]>([]);
-  const [moveItemNames, setMoveItemNames] = useState<string[]>([]);
 
   const { uploadSingleFile } = useS3Upload(
     setUploadingFiles,
@@ -46,9 +44,8 @@ export const FileActionProvider = ({ children }: { children: ReactNode }) => {
     });
   };
 
-  const handleMoveClick = (ids: number[], names: string[]) => {
+  const handleMoveClick = (ids: number[]) => {
     setMoveItemIds(ids);
-    setMoveItemNames(names);
     setMoveModalOpen(true);
   };
 
@@ -67,7 +64,6 @@ export const FileActionProvider = ({ children }: { children: ReactNode }) => {
       moveModalOpen,
       setMoveModalOpen,
       moveItemIds,
-      moveItemNames,
       handleMoveClick
     }}>
       {children}

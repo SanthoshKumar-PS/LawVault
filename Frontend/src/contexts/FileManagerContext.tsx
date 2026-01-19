@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useState, type Dispatch, type ReactNode, type SetStateAction } from "react";
 import type { BreadcrumbItem, FileItem, FolderItem, ViewMode } from "../types/TableTypes"
 import { useAuth } from "./AuthContext";
 import api from "../lib/api";
@@ -11,11 +11,11 @@ type FileManagerContextType = {
     currentFolderId: number|null;
     viewMode: ViewMode;
     selectedItems:number[];
+    selectItem :(id:number,multiSelect?:boolean) => void;
     breadcrumbs: BreadcrumbItem[];
     setBreadcrumbs:(breadcrumbs:BreadcrumbItem[])=>void;
     setViewMode: (mode:ViewMode) => void;
     setCurrentFolder: (folderId:number|null) => void;
-    selectItem :(id:number,multiSelect?:boolean) => void;
     clearSelection: ()=>void;
     addFile:(file: FileItem ) => void;
     addFolder:(name:string) => void;
@@ -24,6 +24,8 @@ type FileManagerContextType = {
     moveItems:(ids:number[], targetFolderId:number|null) => void;
     searchQuery: string;
     setSearchQuery: (query: string) => void;
+    moveLoading: boolean,
+    setMoveLoading: Dispatch<SetStateAction<boolean>>
 }
 
 
@@ -31,6 +33,7 @@ const FileManagerContext = createContext<FileManagerContextType | undefined>(und
 
 export const FileManagerProvider = ({children}:{children: ReactNode}) => {
     const [loading,setLoading] = useState<boolean>(false);
+    const [moveLoading, setMoveLoading] = useState<boolean>(false);
     const [files, setFiles] = useState<FileItem[]>([]);
     const [folders, setFolders] = useState<FolderItem[]>([]);
     const [breadcrumbs, setBreadcrumbs] = useState<BreadcrumbItem[]>([]);
@@ -157,7 +160,52 @@ export const FileManagerProvider = ({children}:{children: ReactNode}) => {
         ))
     }
 
-    const moveItems = (ids:number[], targetFolderId: number| null) => {
+    const moveItems = async (ids:number[], targetFolderId: number| null) => {
+        try {
+            setMoveLoading(true);
+            const response = await api.get('/moveFoldersToTargetId',{
+            params:{
+                targetFolderId:targetFolderId,
+                itemsIds: ids
+                }
+            });
+            console.log("Navigated Folders: ", response.data.currentFolders)
+            setCurrentFolderId(targetFolderId)
+            console.log("Axios response: ",response.data);
+        } catch (error:any) {
+            console.log('Error occured in fetchFoldersAndFiles: ',error)
+            const status = error.response?.status;
+            const serverMessage = error.response?.data.message || error.response?.data
+            const errorMessage = serverMessage || 'Something went wrong'
+            console.log("errorMessage: ",errorMessage);
+            switch(status){
+                case 401:
+                    toast.error('Session expired',{
+                        description:'Please login again to continue.'
+                    });
+                    break;
+                case 403:
+                    toast.error('Access Denied',{
+                        description:'You do not have permission to view this folder.'
+                    });
+                    break;
+                case 404:
+                    toast.error('Not Found', {
+                        description: 'The requested folder does not exist.'
+                    });
+                    break;
+                case 500:
+                    toast.error('Server Error', {
+                        description: 'Our legal vault is temporarily down. Try again later.' 
+                    });
+                       break;
+                default:
+                    toast.error('Connection Error', { description: errorMessage });
+                }
+                
+        } finally{
+            setMoveLoading(false);
+        }
         setFiles(prev=> prev.map(f=>
             ids.includes(f.id)? {...f,parentId:targetFolderId, modifiedAt:new Date()}: f
         ))
@@ -173,11 +221,11 @@ export const FileManagerProvider = ({children}:{children: ReactNode}) => {
                 currentFolderId,
                 viewMode,
                 selectedItems,
+                selectItem,
                 breadcrumbs,
                 setBreadcrumbs,
                 setViewMode,
                 setCurrentFolder,
-                selectItem,
                 clearSelection,
                 addFile,
                 addFolder,
@@ -185,7 +233,9 @@ export const FileManagerProvider = ({children}:{children: ReactNode}) => {
                 renameFolder,
                 moveItems,
                 searchQuery,
-                setSearchQuery
+                setSearchQuery,
+                moveLoading,
+                setMoveLoading
             }}
         >
             {children}
