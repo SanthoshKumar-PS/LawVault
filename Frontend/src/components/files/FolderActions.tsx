@@ -58,7 +58,7 @@ const FolderActions = ({folder, onRename}:FolderActionsType) => {
             <DropdownMenuItem
             onClick={(e) => {
                 e.stopPropagation();
-                handleMoveClick?.([folder.id], [folder.name]);
+                handleMoveClick?.([{ id: folder.id, type: 'folder' }]);
             }}
             className="flex items-center px-3 py-2 text-sm rounded-lg cursor-pointer hover:bg-accent hover:text-accent-foreground outline-none transition-colors"
             >

@@ -3,6 +3,7 @@ import { authController } from '../controllers/authController'
 import {getFilesAndFoldersById, createNewFolder} from '../controllers/filesController'
 import {completeSingleUpload, completeUpload, getPreSignedUrl, getSinglePresignedUrl, initiateUpload} from '../controllers/uploadController'
 import {getFileViewUrl} from '../controllers/viewController'
+import {getRecentsFiles} from '../controllers/recentsController'
 import {getFoldersUnderFolderId, moveFoldersToTargetId} from '../controllers/moveController'
 import {authenticate} from '../middleware/authenticate'
 import {requirePermission} from '../middleware/permission'
@@ -29,3 +30,7 @@ authRouter.post('/getFileViewUrl',authenticate,requirePermission('view'),getFile
 // Move Files Routes
 authRouter.get('/folderNamesById', authenticate, requirePermission('move'), getFoldersUnderFolderId)
 authRouter.get('/moveFoldersToTargetId', authenticate, requirePermission('move'), moveFoldersToTargetId)
+
+
+// Recents Files
+authRouter.get('/files/recents', authenticate, requirePermission('view'), getRecentsFiles)

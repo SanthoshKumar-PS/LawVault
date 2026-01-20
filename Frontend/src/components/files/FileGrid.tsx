@@ -5,6 +5,7 @@ import { cn } from "../../lib/utils";
 import FolderCard from "./FolderCard";
 import FileCard from "./FileCard";
 import { LoadingSpinner } from "../layout/LoadingSpinner";
+import { getGridClass } from "../../lib/styles";
 
 const FileGrid = () => {
     const {loading, files, folders, currentFolderId, viewMode, searchQuery, clearSelection} = useFileManager();
@@ -54,14 +55,7 @@ const FileGrid = () => {
         )
     }
 
-    const gridClass = cn(
-        'grid gap-4',
-        viewMode === 'list'
-            ? 'grid grid-cols-1' 
-            : viewMode === 'large-grid' 
-                ? 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4'
-                : 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6'
-    );
+    const gridClass = getGridClass(viewMode);
 
   return (
     <div onClick={()=>clearSelection()}>

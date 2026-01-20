@@ -45,6 +45,7 @@ export const FileManagerProvider = ({children}:{children: ReactNode}) => {
     useEffect(()=>{
         console.log("Change in folders: ",folders)
     },[folders])
+    
     useEffect(()=>{
         const fetchFoldersAndFiles = async () =>{
             try {
@@ -166,6 +167,10 @@ export const FileManagerProvider = ({children}:{children: ReactNode}) => {
 
     const moveItems = async (items:MoveItemType[], targetFolderId: number| null) => {
         try {
+            console.log("Parsms: ", {
+                targetFolderId:targetFolderId,
+                itemsIds: items
+            })
             setMoveLoading(true);
             const response = await api.get('/moveFoldersToTargetId',{
             params:{

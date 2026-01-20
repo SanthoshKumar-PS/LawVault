@@ -8,6 +8,7 @@ import { Toaster } from "sonner"
 import { FileManagerProvider } from "./contexts/FileManagerContext"
 import { FileActionProvider } from "./contexts/FileActionContext"
 import MainLayout from "./components/layout/MainLayout"
+import Recents from "./pages/Recents"
 const App = () => {
   return (
     <>
@@ -35,7 +36,8 @@ const App = () => {
               <Route path="/home" element={<ProtectedRoutes/>}>
                 <Route element={<MainLayout/>}>
                   <Route index element={<Home/>}/>
-                  <Route path ="colors" element={<Colors/>}/>
+                  <Route path="recents" element={<Recents/>}/>
+                  <Route path="colors" element={<Colors/>}/>
                 </Route>
               </Route>
               

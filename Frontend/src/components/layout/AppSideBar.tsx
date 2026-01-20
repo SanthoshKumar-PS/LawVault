@@ -7,15 +7,17 @@ import {
   HardDrive,
   Plus,
   ChevronDown,
+  Palette,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { useState, type ReactNode } from 'react';
+import { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useFileManager } from '../../contexts/FileManagerContext';
 import { Button } from '../ui/button';
 import { cn } from '../../lib/utils';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@radix-ui/react-collapsible';
 import { Progress } from '../ui/progress';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 type AppSideBarProps = {
     onNewClick:()=>void;
@@ -25,8 +27,10 @@ const AppSideBar = ({onNewClick, onManageUsersClick} : AppSideBarProps) => {
     const {isAdmin} = useAuth();
     const { setCurrentFolder, currentFolderId, folders } = useFileManager();
     const [foldersOpen, setFoldersOpen] = useState<boolean>(true);
+    const navigate = useNavigate();
+    const location = useLocation();
+    console.log('Location: ',location)
 
-    // const rootFolders = folders.filter(f=>f.parentId===null);
     const rootFolders = folders;
     const usedStorage = 4.2;
     const totalStorage = 15;
@@ -50,12 +54,14 @@ const AppSideBar = ({onNewClick, onManageUsersClick} : AppSideBarProps) => {
             <SideBarItem
                 icon={<FolderOpen className='h-5 w-5'/>}
                 label="My Files"
-                active={currentFolderId===null}
-                onClick={()=>setCurrentFolder(null)}
+                active={location.pathname==='/home'}
+                onClick={()=>{setCurrentFolder(null); navigate('/home')}}
             />
             <SideBarItem
                 icon={<Clock className='h-5 w-5'/>}
                 label="Recent"
+                active={location.pathname==='/home/recents'}
+                onClick={()=>{navigate('/home/recents')}}
             />
             <SideBarItem
                 icon={<Star className='h-5 w-5'/>}
@@ -64,6 +70,11 @@ const AppSideBar = ({onNewClick, onManageUsersClick} : AppSideBarProps) => {
             <SideBarItem
                 icon={<Trash2 className='h-5 w-5'/>}
                 label="Trash"
+            />
+            <SideBarItem
+                onClick={()=>{navigate('/home/colors')}}
+                icon={<Palette className='h-5 w-5'/>}
+                label="Colors"
             />
 
             {/* Folders Section  */}

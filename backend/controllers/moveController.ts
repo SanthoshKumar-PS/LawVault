@@ -69,6 +69,7 @@ export const moveFoldersToTargetId = async (req:AuthRequest, res:Response) => {
         if (!itemsIds || !Array.isArray(itemsIds)) {
             return res.status(400).json({ message: "Invalid or missing itemsIds" });
         }
+        console.log("itemsIds: ",itemsIds)
         const folderIds:number[] = itemsIds
             .filter((item:MoveItemType)=>item.type==='folder')
             .map(item => Number(item.id));
