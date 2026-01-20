@@ -3,6 +3,7 @@ import type { UploadingFile } from "../components/uploads/UploadProgress";
 import { useAuth } from "./AuthContext";
 import { useS3Upload } from "../hooks/useS3Upload";
 import { useFileManager } from "./FileManagerContext";
+import type { MoveItemType } from "../types/TableTypes";
 
 type FileActionContextType = {
   uploadingFiles: UploadingFile[];
@@ -11,8 +12,8 @@ type FileActionContextType = {
   handleClearCompleted: () => void;
   moveModalOpen: boolean;
   setMoveModalOpen: (open: boolean) => void;
-  moveItemIds: number[];
-  handleMoveClick: (ids: number[]) => void;
+  moveItemIds: MoveItemType[];
+  handleMoveClick: (items: MoveItemType[]) => void;
 };
 
 const FileActionContext = createContext<FileActionContextType | undefined>(undefined);
@@ -22,7 +23,7 @@ export const FileActionProvider = ({ children }: { children: ReactNode }) => {
   const {currentFolderId} = useFileManager()
   const [uploadingFiles, setUploadingFiles] = useState<UploadingFile[]>([]);
   const [moveModalOpen, setMoveModalOpen] = useState(false);
-  const [moveItemIds, setMoveItemIds] = useState<number[]>([]);
+  const [moveItemIds, setMoveItemIds] = useState<MoveItemType[]>([]);
 
   const { uploadSingleFile } = useS3Upload(
     setUploadingFiles,
@@ -44,8 +45,8 @@ export const FileActionProvider = ({ children }: { children: ReactNode }) => {
     });
   };
 
-  const handleMoveClick = (ids: number[]) => {
-    setMoveItemIds(ids);
+  const handleMoveClick = (items: MoveItemType[]) => {
+    setMoveItemIds(items);
     setMoveModalOpen(true);
   };
 

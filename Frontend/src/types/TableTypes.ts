@@ -70,3 +70,10 @@ export type BreadcrumbItem = {
   id: number | null;
   name: string;
 }
+
+
+
+export type MoveItemType = {
+    id:number;
+    type:'file' | 'folder'
+}

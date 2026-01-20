@@ -3,19 +3,27 @@ import { AuthRequest } from '../lib/AuthRequest';
 import {prisma} from '../lib/prisma'
 import { getBreadcrumbs } from '../lib/getBreadcrumbs';
 
+interface MoveItemType {
+    id:number,
+    type:'file' | 'folder'
+}
 
 export const getFoldersUnderFolderId = async (req:AuthRequest, res:Response) => {
     try{
-        const { navigatedFolderId, itemsIds } = req.query;
+        const { navigatedFolderId } = req.query;
         console.log("Req query: ", req.query);
         const navigatedFolderIdNo = navigatedFolderId ? Number(navigatedFolderId) : null;
-        const excludedIds: number[] = Array.isArray(itemsIds)
-            ? itemsIds.map(Number)
-            : typeof itemsIds === "string"
-                ? itemsIds.split(",").map(Number)
-                : [];
+        const itemsIds = req.query.itemsIds as any as MoveItemType[];
+        
+        if (!itemsIds || !Array.isArray(itemsIds)) {
+            return res.status(400).json({ message: "Invalid or missing itemsIds" });
+        }
+        const excludedFolderIds:number[] = itemsIds
+            .filter((item:MoveItemType)=>item.type==='folder')
+            .map(item => Number(item.id));
 
-        console.log("Excluded IDs: ",excludedIds)
+
+        console.log("Excluded IDs: ",excludedFolderIds)
         
         const currentFolders = await prisma.folder.findMany({
             select:{
@@ -31,7 +39,7 @@ export const getFoldersUnderFolderId = async (req:AuthRequest, res:Response) => 
             where:{
                 parentId:navigatedFolderIdNo,
                 id:{
-                    notIn: excludedIds
+                    notIn: excludedFolderIds
                 }
             },
 
@@ -52,26 +60,45 @@ export const getFoldersUnderFolderId = async (req:AuthRequest, res:Response) => 
 
 export const moveFoldersToTargetId = async (req:AuthRequest, res:Response) => {
     try{
-        const { targetFolderId, itemsIds } = req.query;
+        const { targetFolderId } = req.query;
         console.log("Req query: ", req.query);
         const targetFolderIdNo = targetFolderId ? Number(targetFolderId) : null;
         
-        const includedIds: number[] = Array.isArray(itemsIds)
-            ? itemsIds.map(Number)
-            : typeof itemsIds === "string"
-                ? itemsIds.split(",").map(Number)
-                : [];
+        const itemsIds = req.query.itemsIds as any as MoveItemType[];
         
+        if (!itemsIds || !Array.isArray(itemsIds)) {
+            return res.status(400).json({ message: "Invalid or missing itemsIds" });
+        }
+        const folderIds:number[] = itemsIds
+            .filter((item:MoveItemType)=>item.type==='folder')
+            .map(item => Number(item.id));
+
+        const fileIds:number[] = itemsIds
+            .filter((item:MoveItemType)=>item.type==='file')
+            .map(item => Number(item.id));
+
+        console.log("Recieved files and folders: ",fileIds, folderIds)
+
         const currentFolders = await prisma.folder.updateMany({
             where:{
                 id:{
-                    in: includedIds
+                    in: folderIds
                 }
             },
             data: {
                 parentId:targetFolderIdNo
             }
 
+        });
+        const currentFiles = await prisma.file.updateMany({
+            where:{
+                id:{
+                    in: fileIds
+                }
+            },
+            data: {
+                folderId:targetFolderIdNo
+            }
         });
      
 

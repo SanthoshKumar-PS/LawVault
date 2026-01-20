@@ -16,12 +16,15 @@ type FolderCardProps = {
 const FolderCard = ({folder, viewMode, onRename}:FolderCardProps) => {
     const { hasPermission } = useAuth();
     const { selectItem, selectedItems, setCurrentFolder, deleteItems } = useFileManager();
-    const isSelected = selectedItems.includes(folder.id);
+    const isSelected = selectedItems.some(
+        (item) => item.id===folder.id && item.type==='folder'
+    )
     const totalItems = (folder._count?.files || 0) + (folder._count?.children || 0) 
 
     const handleClick = (e:React.MouseEvent) => {
         e.stopPropagation();
-        selectItem(folder.id, e.ctrlKey || e.metaKey)
+        e.preventDefault();
+        selectItem(folder.id, 'folder', e.ctrlKey || e.metaKey)
     }
 
     const handleDoubleClick = () => {

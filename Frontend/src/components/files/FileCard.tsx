@@ -31,13 +31,15 @@ function formatFileSize(bytes?:number) :string {
 const FileCard = ({ file, viewMode }:FileCardProps) => {
     const { hasPermission } = useAuth();
     const { selectItem, selectedItems, deleteItems } = useFileManager();
-    const isSelected = selectedItems.includes(file.id);
+    const isSelected = selectedItems.some(
+        (item) => item.id === file.id && item.type === 'file'
+    );;
+    
 
     const handleClick = async (e:React.MouseEvent) => {
-        console.log("Click handle")
         e.preventDefault();
-        console.log("File id added:", file.id)
-        selectItem(file.id, e.ctrlKey || e.metaKey);
+        e.stopPropagation()
+        selectItem(file.id, 'file',e.ctrlKey || e.metaKey);
     }
 
     const handleFileOpen = async (s3Key:string)=>{
@@ -159,7 +161,7 @@ function FileActions({file}:FileActionsProps){
                     <DropdownMenuItem
                     onClick={(e) => {
                         e.stopPropagation();
-                        handleMoveClick?.([file.id], [file.name]);
+                        handleMoveClick?.([{ id: file.id, type: 'file' }]);
                     }}
                     className="flex items-center px-3 py-2 text-sm rounded-lg cursor-pointer hover:bg-accent hover:text-accent-foreground outline-none transition-colors"
                     >

@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState, type Dispatch, type ReactNode, type SetStateAction } from "react";
-import type { BreadcrumbItem, FileItem, FolderItem, ViewMode } from "../types/TableTypes"
+import type { BreadcrumbItem, FileItem, FolderItem, MoveItemType, ViewMode } from "../types/TableTypes"
 import { useAuth } from "./AuthContext";
 import api from "../lib/api";
 import { toast } from "sonner";
@@ -10,8 +10,8 @@ type FileManagerContextType = {
     folders: FolderItem[];
     currentFolderId: number|null;
     viewMode: ViewMode;
-    selectedItems:number[];
-    selectItem :(id:number,multiSelect?:boolean) => void;
+    selectedItems:MoveItemType[];
+    selectItem :(id:number, type:'file'|'folder', multiSelect?:boolean) => void;
     breadcrumbs: BreadcrumbItem[];
     setBreadcrumbs:(breadcrumbs:BreadcrumbItem[])=>void;
     setViewMode: (mode:ViewMode) => void;
@@ -21,7 +21,7 @@ type FileManagerContextType = {
     addFolder:(name:string) => void;
     deleteItems:(ids:number[]) => void;
     renameFolder:(id:number, newName:string) => void;
-    moveItems:(ids:number[], targetFolderId:number|null) => void;
+    moveItems:(items:MoveItemType[], targetFolderId:number|null) => void;
     searchQuery: string;
     setSearchQuery: (query: string) => void;
     moveLoading: boolean,
@@ -39,7 +39,7 @@ export const FileManagerProvider = ({children}:{children: ReactNode}) => {
     const [breadcrumbs, setBreadcrumbs] = useState<BreadcrumbItem[]>([]);
     const [currentFolderId, setCurrentFolderId] = useState<number|null>(null);
     const [viewMode, setViewMode] = useState<ViewMode>('list');
-    const [selectedItems, setSelectedItems] = useState<number[]>([]);
+    const [selectedItems, setSelectedItems] = useState<MoveItemType[]>([]);
     const [searchQuery, setSearchQuery] = useState('') 
 
     useEffect(()=>{
@@ -107,14 +107,18 @@ export const FileManagerProvider = ({children}:{children: ReactNode}) => {
         setSelectedItems([]);
     }
 
-    const selectItem = (id:number, multiSelect = false)=>{
-        if(multiSelect) {
-            setSelectedItems(prev =>
-                prev.includes(id)?prev.filter(i => i!==id) : [...prev,id]
-            )
-        } else{
-            setSelectedItems([id]);
-        }
+    const selectItem = (id:number,  type:'file'|'folder', multiSelect = false)=>{
+        const item = {id,type}
+        if (multiSelect) {
+                setSelectedItems(prev => {
+                    const exists = prev.find(i => i.id === id && i.type === type);
+                    return exists 
+                        ? prev.filter(i => !(i.id === id && i.type === type)) 
+                        : [...prev, item];
+                });
+            } else {
+                setSelectedItems([item]);
+            }
     }
 
     const clearSelection = () => setSelectedItems([]);
@@ -160,13 +164,13 @@ export const FileManagerProvider = ({children}:{children: ReactNode}) => {
         ))
     }
 
-    const moveItems = async (ids:number[], targetFolderId: number| null) => {
+    const moveItems = async (items:MoveItemType[], targetFolderId: number| null) => {
         try {
             setMoveLoading(true);
             const response = await api.get('/moveFoldersToTargetId',{
             params:{
                 targetFolderId:targetFolderId,
-                itemsIds: ids
+                itemsIds: items
                 }
             });
             console.log("Navigated Folders: ", response.data.currentFolders)
@@ -206,9 +210,6 @@ export const FileManagerProvider = ({children}:{children: ReactNode}) => {
         } finally{
             setMoveLoading(false);
         }
-        setFiles(prev=> prev.map(f=>
-            ids.includes(f.id)? {...f,parentId:targetFolderId, modifiedAt:new Date()}: f
-        ))
         setSelectedItems([]);
     }
 

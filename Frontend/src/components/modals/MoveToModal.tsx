@@ -15,13 +15,12 @@ import {motion} from 'framer-motion';
 import { Button } from "../ui/button";
 import api from "../../lib/api";
 import { toast } from "sonner";
-import type { BreadcrumbItem, FolderItem } from "../../types/TableTypes";
-
+import type { BreadcrumbItem, FolderItem, MoveItemType } from "../../types/TableTypes";
 
 type MoveToModalProps = {
     open:boolean;
     onOpenChange: (open:boolean) => void;
-    itemsIds:number[];
+    itemsIds:MoveItemType[];
 }
 
 
