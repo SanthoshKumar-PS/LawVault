@@ -20,7 +20,9 @@ export type User = {
     name:string;
     role:UserRole;
     permissions:Permissions;
-    files:FileItem[]
+    files:FileItem[];
+    createdAt:Date;
+    updatedAt:Date;
 }
 
 export type FileType = 'document' | 'pdf' | 'image' | 'video' | 'audio' | 'archive' | 'folder' | 'other';

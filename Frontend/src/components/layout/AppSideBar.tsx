@@ -8,6 +8,7 @@ import {
   Plus,
   ChevronDown,
   Palette,
+  UserCheck,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useState } from 'react';
@@ -15,7 +16,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useFileManager } from '../../contexts/FileManagerContext';
 import { Button } from '../ui/button';
 import { cn } from '../../lib/utils';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@radix-ui/react-collapsible';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../../components/ui/collapsible';
 import { Progress } from '../ui/progress';
 import { useLocation, useNavigate } from 'react-router-dom';
 
@@ -63,14 +64,14 @@ const AppSideBar = ({onNewClick, onManageUsersClick} : AppSideBarProps) => {
                 active={location.pathname==='/home/recents'}
                 onClick={()=>{navigate('/home/recents')}}
             />
-            <SideBarItem
+            {/* <SideBarItem
                 icon={<Star className='h-5 w-5'/>}
                 label="Starred"
             />
             <SideBarItem
                 icon={<Trash2 className='h-5 w-5'/>}
                 label="Trash"
-            />
+            /> */}
             <SideBarItem
                 onClick={()=>{navigate('/home/colors')}}
                 icon={<Palette className='h-5 w-5'/>}
@@ -102,6 +103,20 @@ const AppSideBar = ({onNewClick, onManageUsersClick} : AppSideBarProps) => {
                 
                 </Collapsible>
             </div>
+
+            {isAdmin && (
+                <div className='pt-4 border-t border-border mt-4'>
+                    <p className='px-3 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider'>
+                        Admin
+                    </p>
+                    <SideBarItem
+                        onClick={()=>{navigate('/home/access')}}
+                        icon={<UserCheck className='h-5 w-5'/>}
+                        label="User Access"
+                    />
+
+                </div>
+            )}
         </nav>
 
         {/* Storage Section */}
