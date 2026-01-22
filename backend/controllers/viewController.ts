@@ -8,10 +8,34 @@ const BUCKET = process.env.AWS_S3_BUCKET_NAME;
 export const getFileViewUrl = async (req:AuthRequest, res:Response) => {
     try{
         const { s3Key } = req.body;
+        if(!s3Key){
+            return res.status(400).json({message:'Missing s3Key to fetch file.'})
+        }
 
         const command = new GetObjectCommand({
             Bucket:BUCKET,
             Key:s3Key
+        })
+        const url = await getSignedUrl(s3, command, { expiresIn:3600 });
+        return res.status(200).json({url, s3Key});
+    } catch(error:any){
+        console.log("Failed to fetch file URL", error);
+        return res.status(500).json({message:"Failed to fetch file URL"});
+    }
+}
+
+export const getFileDownloadUrl = async (req:AuthRequest, res:Response) => {
+    try{
+        const { s3Key, fileName } = req.body;
+        
+        if(!s3Key){
+            return res.status(400).json({message:'Missing s3Key to fetch file.'})
+        }
+
+        const command = new GetObjectCommand({
+            Bucket:BUCKET,
+            Key:s3Key,
+            ResponseContentDisposition: `attachment; filename="${fileName}"`
         })
         const url = await getSignedUrl(s3, command, { expiresIn:3600 });
         return res.status(200).json({url, s3Key});

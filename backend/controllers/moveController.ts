@@ -2,8 +2,9 @@ import { Response } from 'express';
 import { AuthRequest } from '../lib/AuthRequest';
 import {prisma} from '../lib/prisma'
 import { getBreadcrumbs } from '../lib/getBreadcrumbs';
+import {getFilesandFolders} from '../utils/getFilesandFolders';
 
-interface MoveItemType {
+export interface MoveItemType {
     id:number,
     type:'file' | 'folder'
 }
@@ -70,13 +71,9 @@ export const moveFoldersToTargetId = async (req:AuthRequest, res:Response) => {
             return res.status(400).json({ message: "Invalid or missing itemsIds" });
         }
         console.log("itemsIds: ",itemsIds)
-        const folderIds:number[] = itemsIds
-            .filter((item:MoveItemType)=>item.type==='folder')
-            .map(item => Number(item.id));
 
-        const fileIds:number[] = itemsIds
-            .filter((item:MoveItemType)=>item.type==='file')
-            .map(item => Number(item.id));
+        const {fileIds, folderIds} = getFilesandFolders(itemsIds);
+
 
         console.log("Recieved files and folders: ",fileIds, folderIds)
 

@@ -5,6 +5,7 @@ import { useS3Upload } from "../hooks/useS3Upload";
 import { useFileManager } from "./FileManagerContext";
 import type { MoveItemType } from "../types/TableTypes";
 import api from "../lib/api";
+import { toast } from "sonner";
 
 type FileActionContextType = {
   uploadingFiles: UploadingFile[];
@@ -17,13 +18,14 @@ type FileActionContextType = {
   handleMoveClick: (items: MoveItemType[]) => void;
   handleFileOpen:(s3Key:string) => void;
   handleFileDownload:(s3Key: string, fileName:string) => void;
+  handleMultipleFilesDownload: () => void;
 };
 
 const FileActionContext = createContext<FileActionContextType | undefined>(undefined);
 
 export const FileActionProvider = ({ children }: { children: ReactNode }) => {
   const { currentUser } = useAuth();
-  const {currentFolderId} = useFileManager()
+  const {currentFolderId, selectedItems, files} = useFileManager()
   const [uploadingFiles, setUploadingFiles] = useState<UploadingFile[]>([]);
   const [moveModalOpen, setMoveModalOpen] = useState(false);
   const [moveItemIds, setMoveItemIds] = useState<MoveItemType[]>([]);
@@ -67,6 +69,48 @@ export const FileActionProvider = ({ children }: { children: ReactNode }) => {
     window.open(data.url,'_blank');
   }
 
+  // TODO: Try Catch Block Usage
+  const handleFileDownload = async (s3Key:string, fileName:string) => {
+    const { data } = await api.post('/getFileDownloadUrl',{
+      s3Key,
+      fileName
+    });
+
+    const link = document.createElement('a');
+    link.href = data.url;
+
+    link.setAttribute('download',fileName);
+
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+  }
+
+  // TODO: Try Catch Block Usage
+  const handleMultipleFilesDownload =  () => {
+    const filesToDownload = selectedItems.filter(prev => prev.type==='file');
+    if(filesToDownload.length===0){
+      toast.error('Please select any files to download.');
+      return;
+    }
+
+    filesToDownload.forEach((item,i)=>{
+      const fileData = files.find(f=>f.id===item.id);
+
+      if(!fileData || !fileData.name || !fileData.s3Key){
+        toast.error(`Could not prepare download for ${fileData?.name}.`);
+        return;
+      }
+
+      const { s3Key, name } = fileData;
+
+      setTimeout(()=>{
+        handleFileDownload(s3Key, name);
+      },i*300);
+
+    })
+
+  }
 
   return (
     <FileActionContext.Provider value={{
@@ -79,7 +123,8 @@ export const FileActionProvider = ({ children }: { children: ReactNode }) => {
       moveItemIds,
       handleMoveClick,
       handleFileOpen,
-      handleFileDownload
+      handleFileDownload,
+      handleMultipleFilesDownload
     }}>
       {children}
     </FileActionContext.Provider>

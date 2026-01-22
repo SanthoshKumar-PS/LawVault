@@ -2,7 +2,7 @@ import express from 'express'
 import { authController } from '../controllers/authController'
 import {getFilesAndFoldersById, createNewFolder} from '../controllers/filesController'
 import {completeSingleUpload, completeUpload, getPreSignedUrl, getSinglePresignedUrl, initiateUpload} from '../controllers/uploadController'
-import {getFileViewUrl} from '../controllers/viewController'
+import { getFileViewUrl, getFileDownloadUrl } from '../controllers/viewController'
 import {getRecentsFiles} from '../controllers/recentsController'
 import { getUserWithPermissions, updateUserPermissions } from '../controllers/userController'
 import {getFoldersUnderFolderId, moveFoldersToTargetId} from '../controllers/moveController'
@@ -27,7 +27,9 @@ authRouter.post('/getSinglePresignedUrl',authenticate,requirePermission('upload'
 authRouter.post('/completeSingleUpload',authenticate,requirePermission('upload'),completeSingleUpload)
 
 
-authRouter.post('/getFileViewUrl',authenticate,requirePermission('view'),getFileViewUrl)
+authRouter.post('/getFileViewUrl',authenticate,requirePermission('view'),getFileViewUrl);
+
+authRouter.post('/getFileDownloadUrl',authenticate,requirePermission('download'),getFileDownloadUrl);
 
 
 

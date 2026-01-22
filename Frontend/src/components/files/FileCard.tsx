@@ -53,7 +53,7 @@ const FileCard = ({ file, viewMode }:FileCardProps) => {
                 onDoubleClick={()=>handleFileOpen(file.s3Key)}
                 className={cn(
                     'flex items-center gap-4 px-4 py-3 rounded-lg cursor-pointer transition-colors border border-transparent group hover:bg-primary/10',
-                    isSelected && 'bg-primary/50 border-primary/20'
+                    isSelected && 'bg-primary/20 border-primary/20'
                 )}
             >
                 <FileIcon file={file} size='md'/>
@@ -119,7 +119,7 @@ type FileActionsProps ={
 function FileActions({file}:FileActionsProps){
     const { hasPermission } = useAuth();
     const { deleteItems } = useFileManager();
-    const { handleMoveClick, handleFileOpen } = useFileActions();
+    const { handleMoveClick, handleFileOpen, handleFileDownload } = useFileActions();
 
     return (
         <DropdownMenu>
@@ -143,6 +143,7 @@ function FileActions({file}:FileActionsProps){
                 {hasPermission('edit_folder') && (
                     <DropdownMenuItem onClick={(e) => {
                         e.stopPropagation();
+                        handleFileDownload(file.s3Key,file.name)
                     }}
                     className="flex items-center px-3 py-2 text-sm rounded-lg cursor-pointer hover:bg-accent hover:text-accent-foreground outline-none transition-colors"
                     >

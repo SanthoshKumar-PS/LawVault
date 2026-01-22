@@ -19,8 +19,9 @@ import { useFileActions } from "../../contexts/FileActionContext";
 
 const Toolbar = () => {
     const {viewMode, setViewMode, breadcrumbs, setCurrentFolder, selectedItems, deleteItems, files, folders} = useFileManager();
-    const { handleMoveClick } = useFileActions();
+    const { handleMoveClick, handleMultipleFilesDownload } = useFileActions();
     const {hasPermission} = useAuth();
+    const hasFolders = selectedItems.some(prev => prev.type==='folder');
 
 
   return (
@@ -59,8 +60,8 @@ const Toolbar = () => {
                     <span className="text-sm text-muted-foreground">
                         {selectedItems.length} selected
                     </span>
-                    {hasPermission('download') && (
-                        <Button variant='outline' size='sm'>
+                    {hasPermission('download') && !hasFolders && (
+                        <Button variant='outline' size='sm' onClick={handleMultipleFilesDownload}>
                             <Download className="h-4 w-4 mr-1"/>
                             Download
                         </Button>
