@@ -55,14 +55,14 @@ const AppSideBar = ({onNewClick, onManageUsersClick} : AppSideBarProps) => {
             <SideBarItem
                 icon={<FolderOpen className='h-5 w-5'/>}
                 label="My Files"
-                active={location.pathname==='/home'}
-                onClick={()=>{setCurrentFolder(null); navigate('/home')}}
+                active={location.pathname==='/dashboard/home'}
+                onClick={()=>{setCurrentFolder(null); navigate('/dashboard/home')}}
             />
             <SideBarItem
                 icon={<Clock className='h-5 w-5'/>}
                 label="Recent"
-                active={location.pathname==='/home/recents'}
-                onClick={()=>{navigate('/home/recents')}}
+                active={location.pathname==='/dashboard/recents'}
+                onClick={()=>{navigate('/dashboard/recents')}}
             />
             {/* <SideBarItem
                 icon={<Star className='h-5 w-5'/>}
@@ -73,9 +73,10 @@ const AppSideBar = ({onNewClick, onManageUsersClick} : AppSideBarProps) => {
                 label="Trash"
             /> */}
             <SideBarItem
-                onClick={()=>{navigate('/home/colors')}}
+                onClick={()=>{navigate('/dashboard/colors')}}
                 icon={<Palette className='h-5 w-5'/>}
                 label="Colors"
+                active={location.pathname==='/dashboard/colors'}
             />
 
             {/* Folders Section  */}
@@ -110,9 +111,10 @@ const AppSideBar = ({onNewClick, onManageUsersClick} : AppSideBarProps) => {
                         Admin
                     </p>
                     <SideBarItem
-                        onClick={()=>{navigate('/home/access')}}
+                        onClick={()=>{navigate('/dashboard/access')}}
                         icon={<UserCheck className='h-5 w-5'/>}
                         label="User Access"
+                        active={location.pathname==='/dashboard/access'}
                     />
 
                 </div>

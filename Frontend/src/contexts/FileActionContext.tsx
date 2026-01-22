@@ -4,6 +4,7 @@ import { useAuth } from "./AuthContext";
 import { useS3Upload } from "../hooks/useS3Upload";
 import { useFileManager } from "./FileManagerContext";
 import type { MoveItemType } from "../types/TableTypes";
+import api from "../lib/api";
 
 type FileActionContextType = {
   uploadingFiles: UploadingFile[];
@@ -14,6 +15,8 @@ type FileActionContextType = {
   setMoveModalOpen: (open: boolean) => void;
   moveItemIds: MoveItemType[];
   handleMoveClick: (items: MoveItemType[]) => void;
+  handleFileOpen:(s3Key:string) => void;
+  handleFileDownload:(s3Key: string, fileName:string) => void;
 };
 
 const FileActionContext = createContext<FileActionContextType | undefined>(undefined);
@@ -56,6 +59,15 @@ export const FileActionProvider = ({ children }: { children: ReactNode }) => {
     );
   };
 
+  const handleFileOpen = async (s3Key:string) => {
+    const { data } = await api.post('/getFileViewUrl',{
+      s3Key
+    });
+
+    window.open(data.url,'_blank');
+  }
+
+
   return (
     <FileActionContext.Provider value={{
       uploadingFiles,
@@ -65,7 +77,9 @@ export const FileActionProvider = ({ children }: { children: ReactNode }) => {
       moveModalOpen,
       setMoveModalOpen,
       moveItemIds,
-      handleMoveClick
+      handleMoveClick,
+      handleFileOpen,
+      handleFileDownload
     }}>
       {children}
     </FileActionContext.Provider>

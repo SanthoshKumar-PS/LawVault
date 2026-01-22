@@ -3,6 +3,7 @@ import type { BreadcrumbItem, FileItem, FolderItem, MoveItemType, ViewMode } fro
 import { useAuth } from "./AuthContext";
 import api from "../lib/api";
 import { toast } from "sonner";
+import { useLocation } from "react-router-dom";
 
 type FileManagerContextType = {
     loading:boolean;
@@ -40,11 +41,10 @@ export const FileManagerProvider = ({children}:{children: ReactNode}) => {
     const [currentFolderId, setCurrentFolderId] = useState<number|null>(null);
     const [viewMode, setViewMode] = useState<ViewMode>('list');
     const [selectedItems, setSelectedItems] = useState<MoveItemType[]>([]);
-    const [searchQuery, setSearchQuery] = useState('') 
+    const [searchQuery, setSearchQuery] = useState('');
+    const location = useLocation();
+    const isHomePage = location.pathname.includes('/home');
 
-    useEffect(()=>{
-        console.log("Change in folders: ",folders)
-    },[folders])
     
     useEffect(()=>{
         const fetchFoldersAndFiles = async () =>{
@@ -97,10 +97,11 @@ export const FileManagerProvider = ({children}:{children: ReactNode}) => {
 
         }
         
-        fetchFoldersAndFiles();
-    },[currentFolderId])
+        if(isHomePage){
+            fetchFoldersAndFiles();
+        }
+    },[currentFolderId, isHomePage])
 
-    const {currentUser} = useAuth();
 
 
     const setCurrentFolder = (folderId:number | null) => {

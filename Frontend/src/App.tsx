@@ -29,14 +29,14 @@ const App = () => {
       }}
     />
     <AuthProvider>
-      <FileManagerProvider>
-        <FileActionProvider>
-          <BrowserRouter>
+      <BrowserRouter>
+        <FileManagerProvider>
+          <FileActionProvider>          
             <Routes>
               <Route path ="/" element={<Login/>}/>
-              <Route path="/home" element={<ProtectedRoutes/>}>
+              <Route path="/dashboard" element={<ProtectedRoutes/>}>
                 <Route element={<MainLayout/>}>
-                  <Route index element={<Home/>}/>
+                  <Route path="home" element={<Home/>}/>
                   <Route path="recents" element={<Recents/>}/>
                   <Route path="access" element={<Access/>}/>
                   <Route path="colors" element={<Colors/>}/>
@@ -44,9 +44,9 @@ const App = () => {
               </Route>
               
             </Routes>
-          </BrowserRouter>
-        </FileActionProvider>
-      </FileManagerProvider>
+          </FileActionProvider>
+        </FileManagerProvider>
+      </BrowserRouter>
     </AuthProvider>
     </>
   )

@@ -16,6 +16,7 @@ import { Button } from "../ui/button";
 import api from "../../lib/api";
 import { toast } from "sonner";
 import type { BreadcrumbItem, FolderItem, MoveItemType } from "../../types/TableTypes";
+import { LoadingSpinner } from "../layout/LoadingSpinner";
 
 type MoveToModalProps = {
     open:boolean;
@@ -194,7 +195,11 @@ const MoveToModal = ({ open, onOpenChange, itemsIds }: MoveToModalProps) => {
 
             {/* Folder List */}
             <ScrollArea className="h-[250px] border rounded-lg">
-                {currentFolders && currentFolders.length===0 ? (
+                {moveLoading ? (
+                    <div className="flex items-center justify-center mb-2">
+                        <LoadingSpinner/>
+                    </div>
+                ):currentFolders && currentFolders.length===0 ? (
                     <div className="flex flex-col items-center justify-center mb-2">
                         <Folder className="h-10 w-10 text-muted-foreground mb-2"/>
                         <p>No subfolders here</p>

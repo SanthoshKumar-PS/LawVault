@@ -30,6 +30,7 @@ function formatFileSize(bytes?:number) :string {
 
 const FileCard = ({ file, viewMode }:FileCardProps) => {
     const { hasPermission } = useAuth();
+    const { handleFileOpen } = useFileActions()
     const { selectItem, selectedItems, deleteItems } = useFileManager();
     const isSelected = selectedItems.some(
         (item) => item.id === file.id && item.type === 'file'
@@ -42,13 +43,6 @@ const FileCard = ({ file, viewMode }:FileCardProps) => {
         selectItem(file.id, 'file',e.ctrlKey || e.metaKey);
     }
 
-    const handleFileOpen = async (s3Key:string)=>{
-        const { data } = await api.post('/getFileViewUrl',{
-            s3Key
-        });
-
-        window.open(data.url,'_blank');
-    }
     
     if(viewMode === 'list'){
         return (
@@ -86,6 +80,7 @@ const FileCard = ({ file, viewMode }:FileCardProps) => {
             animate={{opacity:1, scale:1}}
             whileInView={{y:-2}}
             onClick={handleClick}
+            onDoubleClick={()=>handleFileOpen(file.s3Key)}
             className={cn(
                 'group bg-card rounded-xl border border-border p-4 cursor-pointer file-card-hover',
                 isSelected && 'ring-2 ring-primary border border-primary bg-primary/5',
@@ -124,7 +119,7 @@ type FileActionsProps ={
 function FileActions({file}:FileActionsProps){
     const { hasPermission } = useAuth();
     const { deleteItems } = useFileManager();
-    const { handleMoveClick } = useFileActions();
+    const { handleMoveClick, handleFileOpen } = useFileActions();
 
     return (
         <DropdownMenu>
@@ -139,7 +134,7 @@ function FileActions({file}:FileActionsProps){
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56 p-1 bg-popover border border-border rounded-xl shadow-xl animate-in fade-in-0 zoom-in-95">
                 {/* Add to Starred */}
-                <DropdownMenuItem className="flex items-center px-3 py-2 text-sm rounded-lg cursor-pointer hover:bg-accent hover:text-accent-foreground outline-none transition-colors">
+                <DropdownMenuItem className="flex items-center px-3 py-2 text-sm rounded-lg cursor-pointer hover:bg-accent hover:text-accent-foreground outline-none transition-colors" onClick={()=>handleFileOpen(file.s3Key)}>
                     <Eye className="mr-3 h-4 w-4 text-warning" />
                     <span className="font-medium">Preview</span>
                 </DropdownMenuItem>

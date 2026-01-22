@@ -43,7 +43,12 @@ const Recents = () => {
         }
       })
       console.log("Recents Response: ", response.data);
-      setRecentsFiles(prev => [...prev,...response.data.files]);
+      const newFiles = response.data.files;
+      setRecentsFiles(prev=>{
+        const existingIds = new Set(prev.map(file=>file.id))
+        const uniqueNewFiles = newFiles.filter((file:FileItem) => !existingIds.has(file.id))
+        return [...prev, ...uniqueNewFiles]
+      })
       setHasMore(response.data.hasMore);
     } catch(error:any){
       console.log('Error occured in fetchFoldersAndFiles: ',error)

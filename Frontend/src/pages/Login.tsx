@@ -29,7 +29,7 @@ const Login = () => {
             });
             setCurrentUser(response.data.user)
             localStorage.setItem('LAW_TOKEN',response.data.token)
-            navigate('/home', {replace:true})
+            navigate('/dashboard/home', {replace:true})
 
             console.log(response.data)
 
