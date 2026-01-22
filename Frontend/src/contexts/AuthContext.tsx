@@ -1,6 +1,5 @@
 import { createContext, useContext, useState, type ReactNode } from "react";
 import type { PermissionOption, Permissions, User, UserRole } from "../types/TableTypes"
-import { adminUser, regularUser } from "../mockData";
 
 type AuthContextType = {
     currentUser: User | null;
@@ -11,7 +10,7 @@ type AuthContextType = {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({children}:{children:ReactNode}) => {
-  const [currentUser, setCurrentUser] = useState<User|null>(adminUser);
+  const [currentUser, setCurrentUser] = useState<User|null>(null);
   
   const hasPermission = (permission:PermissionOption):boolean => {
     if(!currentUser) return false
