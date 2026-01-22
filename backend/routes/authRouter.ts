@@ -4,7 +4,7 @@ import {getFilesAndFoldersById, createNewFolder} from '../controllers/filesContr
 import {completeSingleUpload, completeUpload, getPreSignedUrl, getSinglePresignedUrl, initiateUpload} from '../controllers/uploadController'
 import {getFileViewUrl} from '../controllers/viewController'
 import {getRecentsFiles} from '../controllers/recentsController'
-import {getUserWithPermissions} from '../controllers/userController'
+import { getUserWithPermissions, updateUserPermissions } from '../controllers/userController'
 import {getFoldersUnderFolderId, moveFoldersToTargetId} from '../controllers/moveController'
 import {authenticate} from '../middleware/authenticate'
 import {requirePermission} from '../middleware/permission'
@@ -13,6 +13,7 @@ export const authRouter = express.Router()
 
 authRouter.post('/login',authController)
 authRouter.get('/user/access', authenticate, requireAdminPermission(),getUserWithPermissions)
+authRouter.put('/user/permissions', authenticate,requireAdminPermission(),updateUserPermissions)
 
 authRouter.post('/folder',authenticate,requirePermission('create_folder'),createNewFolder)
 

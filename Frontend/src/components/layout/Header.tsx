@@ -9,7 +9,7 @@ interface HeaderProps  {
 }
 const Header = ({onMenuClick}:HeaderProps) => {
   const navigate = useNavigate();
-  const { setCurrentUser } = useAuth();
+  const { currentUser, setCurrentUser } = useAuth();
   return (
     <header className="h-16 bg-card border-b border-border flex items-center justify-between px-4 gap-4">
       <div className="flex items-center gap-2">
@@ -51,7 +51,16 @@ const Header = ({onMenuClick}:HeaderProps) => {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant='ghost' className="h-10 w-10 bg-primary/10 text-primary text-sm font-semibold rounded-full hover:bg-primary/20 hover:text-primary transition-colors">
-              SK
+              {currentUser?.name ? (
+                  currentUser.name
+                      .split(' ')
+                      .filter(Boolean)
+                      .map(n => n[0].toUpperCase())
+                      .join('')
+                      .slice(0, 2)
+              ) : (
+                  "?"
+              )}
             </Button>
           </DropdownMenuTrigger>
           

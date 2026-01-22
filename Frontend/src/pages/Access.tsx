@@ -35,7 +35,9 @@ import { Switch } from '../components/ui/switch';
 const Access = () => {
     const [users, setUsers] = useState<User[]>([]);
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
+    const [permissionDraft, setPermissionDraft] = useState<Permissions|null>(null);
     const [isAccessLoading, setAccessLoading] = useState<boolean>(false);
+    const [isUpdating, setIsUpdating] = useState<boolean>(false);
 
     const getUserWithPermissions = async () => {
         try {
@@ -135,6 +137,40 @@ const Access = () => {
         return permissionConfig.filter(p=>permissions[p.key]).length;
     }
 
+    const updateUserPermissions = async () => {
+        try {
+            setIsUpdating(true);
+            const response = await api.put('/user/permissions',{
+                permissionDraft:permissionDraft
+            });
+            console.log("Response: ", response);
+            if(selectedUser && permissionDraft){
+                setUsers(prevUsers => prevUsers.map(user=>(
+                    user.id===selectedUser?.id 
+                    ? {...user, permissions:permissionDraft} 
+                    : user 
+                )));
+            }
+
+            setSelectedUser(null);
+            setPermissionDraft(null);
+            
+        } catch (error:any) {
+            console.log("Error occured while updating user ", error);
+            toast.error('Error updating permissions',{
+                description:'Please try again later'
+            }); 
+        } finally{
+            setIsUpdating(false);
+        }
+    }
+
+    useEffect(()=>{
+        console.log("Chnages user permissions");
+        console.log("selectedUser: ",selectedUser)
+        console.log("selectedPermis: ",permissionDraft)
+    },[selectedUser,permissionDraft])
+
     
   return (
     <div className='space-y-6'>
@@ -209,7 +245,10 @@ const Access = () => {
                                     </Button>
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent align="end" className="bg-popover border border-border z-50">
-                                        <DropdownMenuItem onClick={() => setSelectedUser(user)}>
+                                        <DropdownMenuItem onClick={()=>{
+                                            setSelectedUser(user);
+                                            setPermissionDraft(user.permissions)
+                                        }}>
                                             <Shield className="mr-2 h-4 w-4" />
                                             Edit Permissions
                                         </DropdownMenuItem>
@@ -234,7 +273,7 @@ const Access = () => {
 
         </div>
 
-      <Dialog open={!!selectedUser} onOpenChange={() => setSelectedUser(null)}>
+      <Dialog open={!!selectedUser && !!permissionDraft} onOpenChange={()=>{setSelectedUser(null); setPermissionDraft(null);}}>
         <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
@@ -284,10 +323,10 @@ const Access = () => {
         )}
 
         {/* Permissions Grid */}
-        {selectedUser && selectedUser.permissions && (
+        {selectedUser && selectedUser.permissions && permissionDraft && (
             <div className='grid gap-2'>
                 {permissionConfig.map(permission=>{
-                    const isEnabled = selectedUser.role === 'ADMIN' || selectedUser?.permissions[permission.key];
+                    const isEnabled = selectedUser.role === 'ADMIN' || permissionDraft[permission.key];
                     const isUserAdmin = selectedUser.role === 'ADMIN'
                     return (
                         <div
@@ -303,7 +342,12 @@ const Access = () => {
                             </div>
                             <Switch 
                                 checked={isEnabled}
-                                onCheckedChange={()=>{}}
+                                onCheckedChange={(checked)=>{
+                                    setPermissionDraft(prev => ({
+                                        ...prev!,
+                                        [permission.key]: checked
+                                    }));
+                                }}
                                 disabled={isUserAdmin}
                                 className={isUserAdmin?'opacity-50':''}
                             />
@@ -334,7 +378,7 @@ const Access = () => {
             <div className='flex items-center justify-between pt-2 text-sm text-muted-foreground border-t'>
                 <span>Active Permissions</span>
                 <span className='font-medium text-foreground'>
-                    {getActivePermissionsCount(selectedUser.permissions)} of {permissionConfig.length}
+                    {getActivePermissionsCount(permissionDraft!)} of {permissionConfig.length}
                 </span>
             </div>
         )}
@@ -342,11 +386,18 @@ const Access = () => {
         {/* Buttons */}
         {selectedUser && selectedUser.role!=='ADMIN'&& (
             <div className='flex items-center gap-2'>
-                <Button variant='outline' className='flex-1 hover:bg-blue-200/50 hover:text-blue-500 transition-colors duration-500' onClick={()=>setSelectedUser(null)}>
+                <Button variant='outline' className='flex-1 hover:bg-blue-200/50 hover:text-blue-500 transition-colors duration-500' onClick={()=>{
+                    setSelectedUser(null);
+                    setPermissionDraft(null);
+                }}>
                     Cancel
                 </Button>
-                <Button variant='default' className='flex-1'>
-                    Update
+                <Button variant='default' className='flex-1'
+                    onClick={()=>{
+                        updateUserPermissions();
+                    }}
+                >
+                    {isUpdating? 'Updating...':'Update'}
                 </Button>
             </div>
         )}
