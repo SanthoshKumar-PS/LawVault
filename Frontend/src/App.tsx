@@ -10,6 +10,7 @@ import { FileActionProvider } from "./contexts/FileActionContext"
 import MainLayout from "./components/layout/MainLayout"
 import Recents from "./pages/Recents"
 import Access from "./pages/Access"
+import Profile from "./pages/Profile"
 const App = () => {
   return (
     <>
@@ -39,6 +40,7 @@ const App = () => {
                   <Route path="home" element={<Home/>}/>
                   <Route path="recents" element={<Recents/>}/>
                   <Route path="access" element={<Access/>}/>
+                  <Route path="profile" element={<Profile/>}/>
                   <Route path="colors" element={<Colors/>}/>
                 </Route>
               </Route>

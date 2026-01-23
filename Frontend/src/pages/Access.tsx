@@ -32,6 +32,7 @@ import { toast } from 'sonner';
 import api from '../lib/api';
 import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar';
 import { Switch } from '../components/ui/switch';
+import { formatDate } from '@/lib/formatDate';
 const Access = () => {
     const [users, setUsers] = useState<User[]>([]);
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
@@ -95,10 +96,7 @@ const Access = () => {
         { key: 'delete_folder', label: 'Delete Folders', description: 'Can delete folders' },
     ];
 
-    const formatDate = (dateString:string) =>{
-        const date = new Date(dateString);
-        return date.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'})
-    }
+
 
     const getPermissionBadges = (user:User) => {
         if(user.role === 'ADMIN'){
