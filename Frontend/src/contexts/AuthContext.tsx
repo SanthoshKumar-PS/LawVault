@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import type { PermissionOption, Permissions, User, UserRole } from "../types/TableTypes"
 
 type AuthContextType = {
@@ -10,7 +10,14 @@ type AuthContextType = {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({children}:{children:ReactNode}) => {
-  const [currentUser, setCurrentUser] = useState<User|null>(null);
+  const [currentUser, setCurrentUser] = useState<User|null>(()=>{
+    const savedUser = localStorage.getItem('user');
+    return savedUser? JSON.parse(savedUser) : null
+  });
+
+  useEffect(()=>{
+    localStorage.setItem('user',JSON.stringify(currentUser));
+  },[currentUser])
   
   const hasPermission = (permission:PermissionOption):boolean => {
     if(!currentUser) return false

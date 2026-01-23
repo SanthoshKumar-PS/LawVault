@@ -31,7 +31,7 @@ export const FileActionProvider = ({ children }: { children: ReactNode }) => {
   const [moveItemIds, setMoveItemIds] = useState<MoveItemType[]>([]);
 
   const { uploadSingleFile } = useS3Upload(
-    setUploadingFiles,
+    setUploadingFiles,  
     currentUser ? currentUser.id : 1,
     currentFolderId??undefined
   );

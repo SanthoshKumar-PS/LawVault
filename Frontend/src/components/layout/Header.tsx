@@ -75,7 +75,9 @@ const Header = ({onMenuClick}:HeaderProps) => {
             
             <DropdownMenuSeparator className="bg-border h-px my-1" />
             
-            <DropdownMenuItem className="flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer transition-colors focus:bg-accent focus:text-accent-foreground outline-none">
+            <DropdownMenuItem className="flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer transition-colors focus:bg-accent focus:text-accent-foreground outline-none"
+              onClick={()=>navigate('/dashboard/profile')}
+            >
               <User className="h-4 w-4 text-muted-foreground"/>
               <span className="font-medium">Profile</span>
             </DropdownMenuItem>
