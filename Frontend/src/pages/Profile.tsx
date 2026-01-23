@@ -5,16 +5,59 @@ import { motion } from 'framer-motion';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { formatDate } from '@/lib/formatDate';
+import { toast } from 'sonner';
+import api from '@/lib/api';
+import { useEffect, useState } from 'react';
 const Profile = () => {
     const { currentUser, isAdmin } = useAuth();
-    const stats = {
-        filesUploaded: 128,
-        foldersCreated: 24,
-        storageUsed: 4.2,
-        totalStorage: 15,
-        lastActive: new Date().toISOString(),
-        memberSince: '2024-06-15T10:30:00.000Z',
-    };
+    const [isProfileLoading, setIsProfileLoading] = useState<boolean>(false);
+    const [userCreated, setUserCreated] = useState<{filesCount:number, foldersCount:number}>({filesCount:0, foldersCount:0})
+
+    const getProfileDetails = async () => {
+        try {
+            setIsProfileLoading(true);
+            const response = await api.get('/user/profile');
+            const {filesCount, foldersCount} = response.data;
+            setUserCreated({filesCount, foldersCount})
+            
+        } catch (error:any) {
+        console.log('Error occured in fetchFoldersAndFiles: ',error)
+        const status = error.response?.status;
+        const serverMessage = error.response?.data.message || error.response?.data
+        const errorMessage = serverMessage || 'Something went wrong'
+        console.log("errorMessage: ",errorMessage);
+        switch(status){
+            case 401:
+            toast.error('Session expired',{
+                description:'Please login again to continue.'
+            });
+            break;
+            case 403:
+            toast.error('Access Denied',{
+                description:'You do not have permission to view this folder.'
+            });
+            break;
+            case 404:
+            toast.error('Not Found', {
+                description: 'The requested folder does not exist.'
+            });
+            break;
+            case 500:
+            toast.error('Server Error', {
+                description: 'Our legal vault is temporarily down. Try again later.' 
+            });
+            break;
+            default:
+            toast.error('Connection Error', { description: errorMessage });
+            }
+        } finally{
+            setIsProfileLoading(false);
+        }
+    }
+
+    useEffect(()=>{
+        getProfileDetails();
+    },[])
 
     const getInitials = (name:string)=>{
         return name.split(' ').map(n=>n[0]).join('').toUpperCase();
@@ -128,7 +171,7 @@ const Profile = () => {
                     </div>
                     <p className='text-sm text-muted-foreground'>Files Uploaded</p>
                 </div>
-                <p className='text-3xl font-bold text-foreground'>{stats.filesUploaded}</p>
+                <p className='text-3xl font-bold text-foreground'>{userCreated.filesCount}</p>
             </motion.div>
 
             <motion.div
@@ -143,9 +186,55 @@ const Profile = () => {
                     </div>
                     <p className='text-sm text-muted-foreground'>Folders Created</p>
                 </div>
-                <p className='text-3xl font-bold text-foreground'>{stats.foldersCreated}</p>
+                <p className='text-3xl font-bold text-foreground'>{userCreated.foldersCount}</p>
             </motion.div>
         </div>
+
+        {/* Permission Sections */}
+        {!isAdmin && (
+            <motion.div
+                initial={{ opacity:0, y:10 }}
+                animate={{ opacity:1, y:0 }}
+                transition={{ delay:0.4 }}
+                className='bg-card border border-border rounded-xl p-6 space-y-4'
+            >
+                <h3 className='text-lg font-semibold text-foreground'>Your Permissions</h3>
+                <div className='flex flex-wrap gap-2'>
+                    {Object.entries(currentUser?.permissions || {})
+                        .filter(([key, value]) => value === true && !['id', 'userId'].includes(key)) // Remove IDs and only keep 'true' values
+                        .map(([permission]) => (
+                            <Badge key={permission} variant='outline' className='capitalize'>
+                                {permission.replace('_', ' ')}
+                            </Badge>
+                        ))
+                    }
+                </div>
+                <p className='text-muted-foreground text-sm font-medium'>You can perform this actions. For more access contact admin.</p>
+
+            </motion.div>
+        )}
+
+        {/* Admin */}
+        {isAdmin && (
+            <motion.div
+                initial={{ opacity:0, y:10 }}
+                animate={{ opacity:1, y:0 }}
+                transition={{ delay:0.4 }}
+                className='bg-card border border-border rounded-xl p-6'
+            >
+                <h3 className='text-lg font-semibold text-foreground mb-4'>Administrator Access</h3>
+                <p className='text-sm text-muted-foreground mb-4'>
+                    As an administrator, you have full access to all features and can manage other users and their access.
+                </p>
+                <div className='flex flex-wrap gap-2'>
+                    <Badge className='bg-primary/10 text-primary border-primary/20'>Full File Access</Badge>
+                    <Badge className='bg-primary/10 text-primary border-primary/20'>User Management</Badge>
+                    <Badge className='bg-primary/10 text-primary border-primary/20'>System Settings</Badge>
+                    <Badge className='bg-primary/10 text-primary border-primary/20'>Security Controls</Badge>
+
+                </div>
+            </motion.div>
+        )}
 
 
     </div>

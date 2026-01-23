@@ -48,3 +48,30 @@ export const updateUserPermissions = async (req:AuthRequest, res: Response) => {
         return res.status(500).json({message:"Internal Server Error"});
     }
 } 
+
+export const getUserprofile = async (req:AuthRequest, res: Response) => {
+    try {
+        const user = req.user;
+        if(!user){
+            return res.status(404).json({message:'User Not Found'});
+        }
+
+        const foldersCount = await prisma.folder.count({
+            where:{
+                createdBy:user.id
+            }
+        });
+
+        const filesCount = await prisma.file.count({
+            where:{
+                createdBy:user.id
+            }
+        });
+    
+        return res.status(200).json({message:'Success', filesCount, foldersCount})
+        
+    } catch (error:any) {
+        console.log("Error occured in updateUserPermissions: ", error);
+        return res.status(500).json({message:"Internal Server Error"});
+    }
+} 
