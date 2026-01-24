@@ -81,6 +81,7 @@ const Toolbar = () => {
                             variant='outline'
                             size='sm'
                             className="text-destructive hover:bg-destructive hover:text-destructive-foreground"
+                            // onClick={()=>deleteItems()}
                         >
                             <Trash2 className="h-4 w-4 mr-1"/>
                             Delete

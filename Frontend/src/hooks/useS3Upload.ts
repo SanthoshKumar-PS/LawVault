@@ -3,6 +3,7 @@ import axios from "axios";
 import { type Dispatch, type SetStateAction, useRef } from "react";
 import type { UploadingFile } from "../components/uploads/UploadProgress";
 import type { FileItem } from "@/types/TableTypes";
+import { handleApiError } from "@/lib/handleApiError";
 
 const CHUNK_SIZE = 5 * 1024 * 1024; 
 const MULTIPART_THRESHOLD = 10 * 1024 * 1024;
@@ -110,7 +111,8 @@ export const useS3Upload = (
             ));
 
         } catch (error) {
-            console.error("Upload Error:", error);
+            console.log("Error occurred in : addFolder ",error);
+            handleApiError(error); 
             setUploadingFiles(prev => prev.map(f => f.id === id ? { ...f, status: 'cancelled' } : f));
         }
     };
