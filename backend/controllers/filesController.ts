@@ -17,12 +17,18 @@ export const getFilesAndFoldersById = async (req:AuthRequest, res:Response)=> {
                         children:true
                     }
                 }
+            },
+            orderBy:{
+                createdAt:'desc'
             }
         });
 
         const filesQuery = prisma.file.findMany({
             where:{
                 folderId:currentFolderIdNo
+            },
+            orderBy:{
+                createdAt:'desc'
             }
         });
 
@@ -73,7 +79,7 @@ export const createNewFolder = async (req:AuthRequest, res:Response) => {
                         children:true
                     }
                 }
-            }      
+            },      
         })
 
         return res.status(200).json({message:'New Folder Created', newFolder});

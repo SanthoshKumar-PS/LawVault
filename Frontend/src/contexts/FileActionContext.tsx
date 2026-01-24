@@ -25,7 +25,7 @@ const FileActionContext = createContext<FileActionContextType | undefined>(undef
 
 export const FileActionProvider = ({ children }: { children: ReactNode }) => {
   const { currentUser } = useAuth();
-  const {currentFolderId, selectedItems, files} = useFileManager()
+  const {currentFolderId, selectedItems, files, setFiles} = useFileManager()
   const [uploadingFiles, setUploadingFiles] = useState<UploadingFile[]>([]);
   const [moveModalOpen, setMoveModalOpen] = useState(false);
   const [moveItemIds, setMoveItemIds] = useState<MoveItemType[]>([]);
@@ -33,6 +33,7 @@ export const FileActionProvider = ({ children }: { children: ReactNode }) => {
   const { uploadSingleFile } = useS3Upload(
     setUploadingFiles,  
     currentUser ? currentUser.id : 1,
+    setFiles,
     currentFolderId??undefined
   );
 

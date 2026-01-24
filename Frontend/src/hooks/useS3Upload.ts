@@ -2,6 +2,7 @@ import api from "../lib/api";
 import axios from "axios";
 import { type Dispatch, type SetStateAction, useRef } from "react";
 import type { UploadingFile } from "../components/uploads/UploadProgress";
+import type { FileItem } from "@/types/TableTypes";
 
 const CHUNK_SIZE = 5 * 1024 * 1024; 
 const MULTIPART_THRESHOLD = 10 * 1024 * 1024;
@@ -9,7 +10,8 @@ const MULTIPART_THRESHOLD = 10 * 1024 * 1024;
 export const useS3Upload = (
     setUploadingFiles: Dispatch<SetStateAction<UploadingFile[]>>,
     userId: number,
-    folderId?: number
+    setFiles:Dispatch<SetStateAction<FileItem[]>>,
+    folderId?: number,
 ) => {
     const lastUpdateRef = useRef<number>(0);
 
@@ -42,10 +44,11 @@ export const useS3Upload = (
                     }
                 });
 
-                await api.post('/completeSingleUpload', {
+                const completeRes = await api.post('/completeSingleUpload', {
                     s3Key,
                     metadata: { name: file.name, size: file.size, mimeType: file.type, userId, folderId }
                 });
+                setFiles(prev=> [completeRes.data.newFile,...prev])
 
             } 
             else {
@@ -90,12 +93,15 @@ export const useS3Upload = (
                     });
                 }
 
-                await api.post('/completeUpload', {
+                const completedRes = await api.post('/completeUpload', {
                     fileName: s3Key,
                     uploadId,
                     parts: completedParts,
                     metadata: { name: file.name, size: file.size, mimeType: file.type, userId, folderId }
                 });
+                setFiles(prev=> [completedRes.data.newFile,...prev])
+
+                console.log("Completed res: ",completedRes)
             }
 
             updateUI(id, 100, true);

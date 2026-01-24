@@ -8,6 +8,7 @@ import { useLocation } from "react-router-dom";
 type FileManagerContextType = {
     loading:boolean;
     files: FileItem[];
+    setFiles:Dispatch<SetStateAction<FileItem[]>>
     folders: FolderItem[];
     currentFolderId: number|null;
     viewMode: ViewMode;
@@ -20,7 +21,7 @@ type FileManagerContextType = {
     clearSelection: ()=>void;
     addFile:(file: FileItem ) => void;
     addFolder:(name:string) => void;
-    deleteItems:(ids:number[]) => void;
+    deleteItems:(items:MoveItemType []) => void;
     renameFolder:(id:number, newName:string) => void;
     moveItems:(items:MoveItemType[], targetFolderId:number|null) => void;
     searchQuery: string;
@@ -154,9 +155,14 @@ export const FileManagerProvider = ({children}:{children: ReactNode}) => {
         }
     }
 
-    const deleteItems = (ids:number[]) => {
-        setFiles(prev => prev.filter(f=>!ids.includes(f.id)));
-        setFolders(prev => prev.filter(f=>!ids.includes(f.id)));
+    const deleteItems = (ids:MoveItemType[]) => {
+        try {
+            
+        } catch (error:any) {
+            
+        }
+        // setFiles(prev => prev.filter(f=>!ids.includes(f.id)));
+        // setFolders(prev => prev.filter(f=>!ids.includes(f.id)));
         setSelectedItems([]);
     }
 
@@ -224,6 +230,7 @@ export const FileManagerProvider = ({children}:{children: ReactNode}) => {
             value={{
                 loading,
                 files,
+                setFiles,
                 folders,
                 currentFolderId,
                 viewMode,
