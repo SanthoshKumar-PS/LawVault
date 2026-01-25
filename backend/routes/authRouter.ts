@@ -5,6 +5,7 @@ import {completeSingleUpload, completeUpload, getPreSignedUrl, getSinglePresigne
 import { getFileViewUrl, getFileDownloadUrl } from '../controllers/viewController'
 import {getRecentsFiles} from '../controllers/recentsController'
 import { getUserWithPermissions, updateUserPermissions, getUserprofile } from '../controllers/userController'
+import {deleteFilesAndFolders} from '../controllers/deleteController'
 import {getFoldersUnderFolderId, moveFoldersToTargetId} from '../controllers/moveController'
 import {authenticate} from '../middleware/authenticate'
 import {requirePermission} from '../middleware/permission'
@@ -33,6 +34,9 @@ authRouter.post('/getFileViewUrl',authenticate,requirePermission('view'),getFile
 authRouter.post('/getFileDownloadUrl',authenticate,requirePermission('download'),getFileDownloadUrl);
 
 
+authRouter.delete('/delete/filesandfoldersIds',authenticate,requirePermission('delete'),deleteFilesAndFolders   );
+
+
 
 // Move Files Routes
 authRouter.get('/folderNamesById', authenticate, requirePermission('move'), getFoldersUnderFolderId)
@@ -41,3 +45,4 @@ authRouter.get('/moveFoldersToTargetId', authenticate, requirePermission('move')
 
 // Recents Files
 authRouter.get('/files/recents', authenticate, requirePermission('view'), getRecentsFiles)
+authRouter.get('/text', getRecentsFiles)

@@ -22,7 +22,7 @@ type FileManagerContextType = {
     clearSelection: ()=>void;
     addFile:(file: FileItem ) => void;
     addFolder:(name:string) => void;
-    deleteItems:(items:MoveItemType []) => void;
+    deleteItems:(itemsIds:MoveItemType []) => void;
     renameFolder:(id:number, newName:string) => void;
     moveItems:(items:MoveItemType[], targetFolderId:number|null) => void;
     searchQuery: string;
@@ -47,30 +47,29 @@ export const FileManagerProvider = ({children}:{children: ReactNode}) => {
     const location = useLocation();
     const isHomePage = location.pathname.includes('/home');
 
-    
-    useEffect(()=>{
-        const fetchFoldersAndFiles = async () =>{
-            try {
-                setLoading(true);
-                const response = await api.get('/files',{
-                    params:{
-                        currentFolderId:currentFolderId
-                    }
-                });
-                console.log("Folders: ", response.data.folders)
-                setFolders(response.data.folders);
-                setFiles(response.data.files);
-                setBreadcrumbs(response.data.breadcrumbs)
-                console.log("Axios response: ",response.data);
-            } catch (error:any) {
-                console.log("Error occurred in : fetchFoldersAndFiles ",error )
-                handleApiError(error);                
-            } finally{
-                setLoading(false);
-            }
-
+    const fetchFoldersAndFiles = async () =>{
+        try {
+            setLoading(true);
+            const response = await api.get('/files',{
+                params:{
+                currentFolderId:currentFolderId
+                }
+            });
+            console.log("Folders: ", response.data.folders)
+            setFolders(response.data.folders);
+            setFiles(response.data.files);
+            setBreadcrumbs(response.data.breadcrumbs)
+            console.log("Axios response: ",response.data);
+        } catch (error:any) {
+            console.log("Error occurred in : fetchFoldersAndFiles ",error )
+            handleApiError(error);                
+        } finally{
+            setLoading(false);
         }
-        
+    }
+
+
+    useEffect(()=>{
         if(isHomePage){
             fetchFoldersAndFiles();
         }
@@ -129,16 +128,23 @@ export const FileManagerProvider = ({children}:{children: ReactNode}) => {
         }
     }
 
-    const deleteItems = (ids:MoveItemType[]) => {
+    const deleteItems = async (itemsIds:MoveItemType[]) => {
+        const toastId = toast.loading('Deleting files...');
         try {
-            
+            const response = await api.delete('/delete/filesandfoldersIds',{
+                data:{
+                    itemsIds
+                }
+            });
+            setSelectedItems([]);
+            console.log("Delete Items Response: ", response);
+            toast.success('Deleted successfully',{id:toastId});
+            fetchFoldersAndFiles();
         } catch (error:any) {
-            console.log("Error occurred in : addFolder ",error)
+            toast.dismiss(toastId);
+            console.log("Error occurred in : addFolder ",error);
             handleApiError(error); 
         }
-        // setFiles(prev => prev.filter(f=>!ids.includes(f.id)));
-        // setFolders(prev => prev.filter(f=>!ids.includes(f.id)));
-        setSelectedItems([]);
     }
 
     const renameFolder = (id:number, newName:string) => {
