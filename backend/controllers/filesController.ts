@@ -104,3 +104,33 @@ export const getRecentFoldersAndFiles = async (req:AuthRequest, res:Response) =>
         
     }
 }
+
+export const renameFileOrFolder = async (req:AuthRequest, res:Response) => {
+    try {
+        const {id, type, newName} = req.body;
+        console.log("All details: ", id, type, newName)
+        if(type==='file'){
+            const updatedFile = await prisma.file.update({
+                where:{id},
+                data:{
+                    name:newName
+                }
+            });
+            console.log("Updated File: ", updatedFile);
+            return res.status(200).json({ message: 'File renamed successfully', data: updatedFile });
+        } else{
+            const updatedFolder = await prisma.folder.update({
+                where:{id},
+                data:{
+                    name:newName
+                }
+            });
+            console.log("Updated Folder: ", updatedFolder)
+            return res.status(200).json({ message: 'File renamed successfully', data: updatedFolder });
+        }
+    } catch (error:any) {
+        console.log("Error occured in getRecentFoldersAndFiles", error);
+        return res.status(500).json({message:'Internal Server Error'});
+        
+    }
+}

@@ -1,6 +1,6 @@
 import express from 'express'
 import { authController } from '../controllers/authController'
-import {getFilesAndFoldersById, createNewFolder} from '../controllers/filesController'
+import {getFilesAndFoldersById, createNewFolder, renameFileOrFolder} from '../controllers/filesController'
 import {completeSingleUpload, completeUpload, getPreSignedUrl, getSinglePresignedUrl, initiateUpload} from '../controllers/uploadController'
 import { getFileViewUrl, getFileDownloadUrl } from '../controllers/viewController'
 import {getRecentsFiles} from '../controllers/recentsController'
@@ -35,6 +35,8 @@ authRouter.post('/getFileDownloadUrl',authenticate,requirePermission('download')
 
 
 authRouter.delete('/delete/filesandfoldersIds',authenticate,requirePermission('delete'),deleteFilesAndFolders   );
+
+authRouter.patch('/renameFileOrFolder',authenticate,requirePermission('edit_folder'),renameFileOrFolder   );
 
 
 

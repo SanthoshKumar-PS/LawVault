@@ -79,3 +79,9 @@ export type MoveItemType = {
     id:number;
     type:'file' | 'folder'
 }
+
+export type RenameItemType = {
+    id:number;
+    type:'file' | 'folder';
+    name:string;
+}
