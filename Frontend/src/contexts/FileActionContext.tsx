@@ -1,9 +1,9 @@
-import { createContext, useContext, useState, type ReactNode } from "react";
+import { createContext, useContext, useState, type Dispatch, type ReactNode, type SetStateAction } from "react";
 import type { UploadingFile } from "../components/uploads/UploadProgress";
 import { useAuth } from "./AuthContext";
 import { useS3Upload } from "../hooks/useS3Upload";
 import { useFileManager } from "./FileManagerContext";
-import type { MoveItemType } from "../types/TableTypes";
+import type { MoveItemType, RenameItemType } from "../types/TableTypes";
 import api from "../lib/api";
 import { toast } from "sonner";
 
@@ -14,6 +14,10 @@ type FileActionContextType = {
   handleClearCompleted: () => void;
   moveModalOpen: boolean;
   setMoveModalOpen: (open: boolean) => void;
+  renameModalOpen:boolean;
+  setRenameModalOpen: Dispatch<SetStateAction<boolean>>;
+  renameItem:RenameItemType|null;
+  setRenameItem:Dispatch<SetStateAction<RenameItemType|null>>;
   moveItemIds: MoveItemType[];
   handleMoveClick: (items: MoveItemType[]) => void;
   handleFileOpen:(s3Key:string) => void;
@@ -28,6 +32,8 @@ export const FileActionProvider = ({ children }: { children: ReactNode }) => {
   const {currentFolderId, selectedItems, files, setFiles} = useFileManager()
   const [uploadingFiles, setUploadingFiles] = useState<UploadingFile[]>([]);
   const [moveModalOpen, setMoveModalOpen] = useState(false);
+  const [renameModalOpen, setRenameModalOpen] = useState<boolean>(false);
+  const [renameItem, setRenameItem] = useState<RenameItemType|null>(null);
   const [moveItemIds, setMoveItemIds] = useState<MoveItemType[]>([]);
 
   const { uploadSingleFile } = useS3Upload(
@@ -121,6 +127,10 @@ export const FileActionProvider = ({ children }: { children: ReactNode }) => {
       handleClearCompleted: () => setUploadingFiles(prev => prev.filter(f => f.status !== 'completed')),
       moveModalOpen,
       setMoveModalOpen,
+      renameModalOpen,
+      setRenameModalOpen,
+      renameItem,
+      setRenameItem,
       moveItemIds,
       handleMoveClick,
       handleFileOpen,

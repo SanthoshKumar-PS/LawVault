@@ -12,6 +12,7 @@ import { Button } from "../../components/ui/button";
 
 import { useFileManager } from "../../contexts/FileManagerContext";
 import { useFileActions } from "../../contexts/FileActionContext";
+import RenameModal from "../modals/RenameModal";
 
 const MainLayout = () => {
   const [sideBarOpen, setSideBarOpen] = useState(false);
@@ -22,7 +23,7 @@ const MainLayout = () => {
   const { 
     uploadingFiles, handleStartUpload, handleUploadComplete, 
     handleClearCompleted, handleMoveClick, moveModalOpen, 
-    setMoveModalOpen, moveItemIds 
+    setMoveModalOpen,renameModalOpen, setRenameModalOpen ,moveItemIds,renameItem
   } = useFileActions();
 
   return (
@@ -80,6 +81,12 @@ const MainLayout = () => {
         open={moveModalOpen}
         onOpenChange={setMoveModalOpen}
         itemsIds={moveItemIds}
+      />
+
+      <RenameModal
+        open={renameModalOpen}
+        onOpenChange={setRenameModalOpen}
+        renameItem = {renameItem}
       />
 
       <AnimatePresence>

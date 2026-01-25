@@ -19,7 +19,7 @@ type FolderActionsType = {
 const FolderActions = ({folder, onRename}:FolderActionsType) => {
     const { hasPermission } = useAuth();
     const { deleteItems } = useFileManager();
-    const { handleMoveClick } = useFileActions();
+    const { handleMoveClick, setRenameModalOpen, setRenameItem } = useFileActions();
 
   return (
     <DropdownMenu>
@@ -44,7 +44,9 @@ const FolderActions = ({folder, onRename}:FolderActionsType) => {
         {hasPermission('edit_folder') && (
             <DropdownMenuItem onClick={(e) => {
                 e.stopPropagation();
-                onRename?.(folder.id);
+                setRenameItem({ id:folder.id, type:'folder', name:folder.name })
+                setRenameModalOpen(true);
+
             }}
             className="flex items-center px-3 py-2 text-sm rounded-lg cursor-pointer hover:bg-accent hover:text-accent-foreground outline-none transition-colors"
             >
@@ -76,8 +78,9 @@ const FolderActions = ({folder, onRename}:FolderActionsType) => {
             className="flex items-center px-3 py-2 text-sm rounded-lg cursor-pointer text-destructive focus:bg-destructive/10 focus:text-destructive outline-none transition-colors"
             onClick={(e) => {
                 e.stopPropagation();
-                deleteItems([folder.id]);
+                // deleteItems([folder.id]);
             }}
+            disabled={true}
             >
                 <Trash2 className="mr-3 h-4 w-4" />
                 <span className="font-medium">Delete</span>

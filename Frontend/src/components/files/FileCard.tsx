@@ -119,7 +119,7 @@ type FileActionsProps ={
 function FileActions({file}:FileActionsProps){
     const { hasPermission } = useAuth();
     const { deleteItems } = useFileManager();
-    const { handleMoveClick, handleFileOpen, handleFileDownload } = useFileActions();
+    const { handleMoveClick, handleFileOpen, handleFileDownload, setRenameModalOpen, setRenameItem } = useFileActions();
 
     return (
         <DropdownMenu>
@@ -139,8 +139,8 @@ function FileActions({file}:FileActionsProps){
                     <span className="font-medium">Preview</span>
                 </DropdownMenuItem>
 
-                {/* Rename */}
-                {hasPermission('edit_folder') && (
+                {/* Download */}
+                {hasPermission('download') && (
                     <DropdownMenuItem onClick={(e) => {
                         e.stopPropagation();
                         handleFileDownload(file.s3Key,file.name)
@@ -149,6 +149,20 @@ function FileActions({file}:FileActionsProps){
                     >
                         <Download className="mr-3 h-4 w-4 text-muted-foreground" />
                         <span className="font-medium">Download</span>
+                    </DropdownMenuItem>
+                )}
+
+                {/* Rename */}
+                {hasPermission('edit_folder') && (
+                    <DropdownMenuItem onClick={(e) => {
+                        e.stopPropagation();
+                        setRenameItem({ id:file.id, type:'file', name:file.name })
+                        setRenameModalOpen(true);
+                    }}
+                    className="flex items-center px-3 py-2 text-sm rounded-lg cursor-pointer hover:bg-accent hover:text-accent-foreground outline-none transition-colors"
+                    >
+                        <Pencil className="mr-3 h-4 w-4 text-muted-foreground" />
+                        <span className="font-medium">Rename</span>
                     </DropdownMenuItem>
                 )}
 

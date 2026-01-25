@@ -3,7 +3,7 @@ import type { BreadcrumbItem, FileItem, FolderItem, MoveItemType, ViewMode } fro
 import { useAuth } from "./AuthContext";
 import api from "../lib/api";
 import { toast } from "sonner";
-import { useLocation } from "react-router-dom";
+import { data, useLocation } from "react-router-dom";
 import { handleApiError } from "@/lib/handleApiError";
 
 type FileManagerContextType = {
@@ -23,12 +23,16 @@ type FileManagerContextType = {
     addFile:(file: FileItem ) => void;
     addFolder:(name:string) => void;
     deleteItems:(itemsIds:MoveItemType []) => void;
-    renameFolder:(id:number, newName:string) => void;
+    renameItemByType:(id:number,type:'file'|'folder', newName:string) =>Promise<any>;
     moveItems:(items:MoveItemType[], targetFolderId:number|null) => void;
     searchQuery: string;
     setSearchQuery: (query: string) => void;
     moveLoading: boolean,
-    setMoveLoading: Dispatch<SetStateAction<boolean>>
+    setMoveLoading: Dispatch<SetStateAction<boolean>>;
+    recentsFiles: FileItem[];
+    recentsLoading:boolean;
+    fetchRecents:(page:number) => Promise<void>;
+    hasMoreRecents:boolean
 }
 
 
@@ -46,6 +50,9 @@ export const FileManagerProvider = ({children}:{children: ReactNode}) => {
     const [searchQuery, setSearchQuery] = useState('');
     const location = useLocation();
     const isHomePage = location.pathname.includes('/home');
+    const [recentsFiles, setRecentsFiles] = useState<FileItem[]>([]);
+    const [hasMoreRecents, setHasMoreRecents] = useState(false);
+    const [recentsLoading, setRecentsLoading] = useState<boolean>(false);
 
     const fetchFoldersAndFiles = async () =>{
         try {
@@ -67,6 +74,31 @@ export const FileManagerProvider = ({children}:{children: ReactNode}) => {
             setLoading(false);
         }
     }
+
+  const fetchRecents = async (pageNo:number) => {
+    try{
+      setRecentsLoading(true);
+      const response = await api.get('/files/recents', {
+        params:{
+          page:pageNo,
+          limit:10
+        }
+      })
+      console.log("Recents Response: ", response.data);
+      const newFiles = response.data.files;
+      setRecentsFiles(prev=>{
+        const existingIds = new Set(prev.map(file=>file.id))
+        const uniqueNewFiles = newFiles.filter((file:FileItem) => !existingIds.has(file.id))
+        return [...prev, ...uniqueNewFiles]
+      })
+      setHasMoreRecents(response.data.hasMore);
+    } catch(error:any){
+      console.log("Error occurred in : getRecentsFiles ",error)
+      handleApiError(error); 
+    } finally{
+      setRecentsLoading(false);
+    }
+  }
 
 
     useEffect(()=>{
@@ -147,10 +179,32 @@ export const FileManagerProvider = ({children}:{children: ReactNode}) => {
         }
     }
 
-    const renameFolder = (id:number, newName:string) => {
-        setFolders(prev => prev.map(f=>
-            f.id === id ? {...f,name:newName, modifiedAt: new Date()} : f
-        ))
+    const renameItemByType = async (id:number, type:'file' | 'folder',  newName:string) => {
+        try {
+            const response = await api.patch('/renameFileOrFolder',{
+                id, type, newName
+            });
+            // TOREVIEW
+            setFiles(prev => prev.map(item => 
+                (item.id === id && type === 'file') ? { ...item, name: newName } : item
+            ));
+
+            setFolders(prev => prev.map(item => 
+                (item.id === id && type === 'folder') ? { ...item, name: newName } : item
+            ));
+
+            setRecentsFiles(prev => prev.map(item => 
+                (item.id === id && type === 'file') ? { ...item, name: newName } : item
+            ));
+
+            toast.success("Renamed successfully");
+            console.log("Success");
+            return response.data;
+        } catch (error:any) {
+            console.log("Error occured while renaming the file");
+            handleApiError(error);
+            throw error;        
+        }
     }
 
     const moveItems = async (items:MoveItemType[], targetFolderId: number| null) => {
@@ -199,12 +253,16 @@ export const FileManagerProvider = ({children}:{children: ReactNode}) => {
                 addFile,
                 addFolder,
                 deleteItems,
-                renameFolder,
+                renameItemByType,
                 moveItems,
                 searchQuery,
                 setSearchQuery,
                 moveLoading,
-                setMoveLoading
+                setMoveLoading,
+                recentsFiles,
+                recentsLoading,
+                fetchRecents,
+                hasMoreRecents
             }}
         >
             {children}

@@ -8,13 +8,10 @@ import FileCard from "../components/files/FileCard";
 import { toast } from "sonner";
 import api from "../lib/api";
 import { LoadingSpinner } from "../components/layout/LoadingSpinner";
-import { handleApiError } from "@/lib/handleApiError";
 const Recents = () => {
   const { viewMode } = useFileManager()
-  const [recentsFiles,setRecentsFiles] = useState<FileItem[]>([]);
-  const [recentsLoading, setRecentsLoading] = useState<boolean>(false);
   const [pageNo, setPageNo] = useState<number>(1);
-  const [hasMore, setHasMore] = useState<boolean>(false);
+  const { recentsFiles, fetchRecents, hasMoreRecents, recentsLoading } = useFileManager();
 
   const gridClass = getGridClass(viewMode);
 
@@ -25,42 +22,18 @@ const Recents = () => {
     if(observer.current) observer.current.disconnect();
 
     observer.current = new IntersectionObserver(entries => {
-      if(entries[0].isIntersecting && hasMore){
+      if(entries[0].isIntersecting && hasMoreRecents){
         setPageNo(prev=>prev+1)
       }
     });
 
     if(node) observer.current.observe(node);
     
-  },[recentsLoading, hasMore]);
+  },[recentsLoading, hasMoreRecents]);
 
-  const getRecentsFiles = async () => {
-    try{
-      setRecentsLoading(true);
-      const response = await api.get('/files/recents', {
-        params:{
-          page:pageNo,
-          limit:10
-        }
-      })
-      console.log("Recents Response: ", response.data);
-      const newFiles = response.data.files;
-      setRecentsFiles(prev=>{
-        const existingIds = new Set(prev.map(file=>file.id))
-        const uniqueNewFiles = newFiles.filter((file:FileItem) => !existingIds.has(file.id))
-        return [...prev, ...uniqueNewFiles]
-      })
-      setHasMore(response.data.hasMore);
-    } catch(error:any){
-      console.log("Error occurred in : getRecentsFiles ",error)
-      handleApiError(error); 
-    } finally{
-      setRecentsLoading(false);
-    }
-  }
 
   useEffect(()=>{
-    getRecentsFiles();
+    fetchRecents(pageNo);
   },[pageNo])
 
 
