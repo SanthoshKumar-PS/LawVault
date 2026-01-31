@@ -5,6 +5,7 @@ import api from "../lib/api";
 import { toast } from "sonner";
 import { data, useLocation } from "react-router-dom";
 import { handleApiError } from "@/lib/handleApiError";
+import useCurrentLocation from "@/hooks/useCurrentLocation";
 
 type FileManagerContextType = {
     loading:boolean;
@@ -48,11 +49,11 @@ export const FileManagerProvider = ({children}:{children: ReactNode}) => {
     const [viewMode, setViewMode] = useState<ViewMode>('list');
     const [selectedItems, setSelectedItems] = useState<MoveItemType[]>([]);
     const [searchQuery, setSearchQuery] = useState('');
-    const location = useLocation();
-    const isHomePage = location.pathname.includes('/home');
     const [recentsFiles, setRecentsFiles] = useState<FileItem[]>([]);
     const [hasMoreRecents, setHasMoreRecents] = useState(false);
     const [recentsLoading, setRecentsLoading] = useState<boolean>(false);
+
+    const {pageName} = useCurrentLocation();
 
     const fetchFoldersAndFiles = async () =>{
         try {
@@ -76,6 +77,7 @@ export const FileManagerProvider = ({children}:{children: ReactNode}) => {
     }
 
   const fetchRecents = async (pageNo:number) => {
+    if(recentsLoading) return
     try{
       setRecentsLoading(true);
       const response = await api.get('/files/recents', {
@@ -86,11 +88,15 @@ export const FileManagerProvider = ({children}:{children: ReactNode}) => {
       })
       console.log("Recents Response: ", response.data);
       const newFiles = response.data.files;
-      setRecentsFiles(prev=>{
-        const existingIds = new Set(prev.map(file=>file.id))
-        const uniqueNewFiles = newFiles.filter((file:FileItem) => !existingIds.has(file.id))
-        return [...prev, ...uniqueNewFiles]
-      })
+      if(pageNo===1){
+        setRecentsFiles(newFiles);
+      } else{
+        setRecentsFiles(prev=>{
+            const existingIds = new Set(prev.map(file=>file.id))
+            const uniqueNewFiles = newFiles.filter((file:FileItem) => !existingIds.has(file.id))
+            return [...prev, ...uniqueNewFiles]
+        })
+      }
       setHasMoreRecents(response.data.hasMore);
     } catch(error:any){
       console.log("Error occurred in : getRecentsFiles ",error)
@@ -102,10 +108,10 @@ export const FileManagerProvider = ({children}:{children: ReactNode}) => {
 
 
     useEffect(()=>{
-        if(isHomePage){
+        if(pageName==='home'){
             fetchFoldersAndFiles();
         }
-    },[currentFolderId, isHomePage])
+    },[currentFolderId, pageName])
 
 
 
@@ -184,19 +190,22 @@ export const FileManagerProvider = ({children}:{children: ReactNode}) => {
             const response = await api.patch('/renameFileOrFolder',{
                 id, type, newName
             });
-            // TOREVIEW
-            setFiles(prev => prev.map(item => 
-                (item.id === id && type === 'file') ? { ...item, name: newName } : item
-            ));
-
-            setFolders(prev => prev.map(item => 
-                (item.id === id && type === 'folder') ? { ...item, name: newName } : item
-            ));
-
-            setRecentsFiles(prev => prev.map(item => 
-                (item.id === id && type === 'file') ? { ...item, name: newName } : item
-            ));
-
+            console.log("Rename Item By Type: ",{ id, type, newName, pageName})
+            if(pageName==='home'){
+                if(type==='file'){
+                    setFiles(prev => prev.map(item => 
+                        (item.id === id && type === 'file') ? { ...item, name: newName } : item
+                    ));
+                } else{
+                    setFolders(prev => prev.map(item => 
+                        (item.id === id && type === 'folder') ? { ...item, name: newName } : item
+                    ));
+                }
+            } else if(pageName==='recents'){
+                setRecentsFiles(prev => prev.map(item => 
+                    (item.id === id && type === 'file') ? { ...item, name: newName } : item
+                ));
+            }
             toast.success("Renamed successfully");
             console.log("Success");
             return response.data;

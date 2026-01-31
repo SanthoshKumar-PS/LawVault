@@ -19,6 +19,7 @@ import { cn } from '../../lib/utils';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../../components/ui/collapsible';
 import { Progress } from '../ui/progress';
 import { useLocation, useNavigate } from 'react-router-dom';
+import useCurrentLocation from '@/hooks/useCurrentLocation';
 
 type AppSideBarProps = {
     onNewClick:()=>void;
@@ -29,8 +30,7 @@ const AppSideBar = ({onNewClick, onManageUsersClick} : AppSideBarProps) => {
     const { setCurrentFolder, currentFolderId, folders } = useFileManager();
     const [foldersOpen, setFoldersOpen] = useState<boolean>(true);
     const navigate = useNavigate();
-    const location = useLocation();
-    console.log('Location: ',location)
+    const { pageName }  = useCurrentLocation();
 
     const rootFolders = folders;
     const usedStorage = 4.2;
@@ -55,13 +55,13 @@ const AppSideBar = ({onNewClick, onManageUsersClick} : AppSideBarProps) => {
             <SideBarItem
                 icon={<FolderOpen className='h-5 w-5'/>}
                 label="My Files"
-                active={location.pathname==='/dashboard/home'}
+                active={pageName === 'home'}
                 onClick={()=>{setCurrentFolder(null); navigate('/dashboard/home')}}
             />
             <SideBarItem
                 icon={<Clock className='h-5 w-5'/>}
                 label="Recent"
-                active={location.pathname==='/dashboard/recents'}
+                active={pageName === 'recents'}
                 onClick={()=>{navigate('/dashboard/recents')}}
             />
             {/* <SideBarItem
@@ -76,7 +76,7 @@ const AppSideBar = ({onNewClick, onManageUsersClick} : AppSideBarProps) => {
                 onClick={()=>{navigate('/dashboard/colors')}}
                 icon={<Palette className='h-5 w-5'/>}
                 label="Colors"
-                active={location.pathname==='/dashboard/colors'}
+                active={pageName === 'colors'}
             />
 
             {/* Folders Section  */}
@@ -114,7 +114,7 @@ const AppSideBar = ({onNewClick, onManageUsersClick} : AppSideBarProps) => {
                         onClick={()=>{navigate('/dashboard/access')}}
                         icon={<UserCheck className='h-5 w-5'/>}
                         label="User Access"
-                        active={location.pathname==='/dashboard/access'}
+                        active={pageName === 'access'}
                     />
 
                 </div>

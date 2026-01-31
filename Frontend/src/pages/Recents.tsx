@@ -8,9 +8,11 @@ import FileCard from "../components/files/FileCard";
 import { toast } from "sonner";
 import api from "../lib/api";
 import { LoadingSpinner } from "../components/layout/LoadingSpinner";
+import useCurrentLocation from "@/hooks/useCurrentLocation";
 const Recents = () => {
   const { viewMode } = useFileManager()
   const [pageNo, setPageNo] = useState<number>(1);
+  const { pageName }  = useCurrentLocation();
   const { recentsFiles, fetchRecents, hasMoreRecents, recentsLoading } = useFileManager();
 
   const gridClass = getGridClass(viewMode);
@@ -33,8 +35,11 @@ const Recents = () => {
 
 
   useEffect(()=>{
-    fetchRecents(pageNo);
-  },[pageNo])
+    if(pageName==='recents'){
+      console.log("Refetch recents files")
+      fetchRecents(pageNo);
+    }
+  },[pageNo, pageName])
 
 
   return (
