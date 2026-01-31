@@ -31,6 +31,7 @@ type FileManagerContextType = {
     moveLoading: boolean,
     setMoveLoading: Dispatch<SetStateAction<boolean>>;
     recentsFiles: FileItem[];
+    setRecentsFiles: Dispatch<SetStateAction<FileItem[]>>;
     recentsLoading:boolean;
     fetchRecents:(page:number) => Promise<void>;
     hasMoreRecents:boolean
@@ -269,6 +270,7 @@ export const FileManagerProvider = ({children}:{children: ReactNode}) => {
                 moveLoading,
                 setMoveLoading,
                 recentsFiles,
+                setRecentsFiles,
                 recentsLoading,
                 fetchRecents,
                 hasMoreRecents

@@ -4,6 +4,7 @@ import { type Dispatch, type SetStateAction, useRef } from "react";
 import type { UploadingFile } from "../components/uploads/UploadProgress";
 import type { FileItem } from "@/types/TableTypes";
 import { handleApiError } from "@/lib/handleApiError";
+import useCurrentLocation from "./useCurrentLocation";
 
 const CHUNK_SIZE = 5 * 1024 * 1024; 
 const MULTIPART_THRESHOLD = 10 * 1024 * 1024;
@@ -12,8 +13,10 @@ export const useS3Upload = (
     setUploadingFiles: Dispatch<SetStateAction<UploadingFile[]>>,
     userId: number,
     setFiles:Dispatch<SetStateAction<FileItem[]>>,
+    setRecentsFiles:Dispatch<SetStateAction<FileItem[]>>,
     folderId?: number,
 ) => {
+    const { pageName } = useCurrentLocation();
     const lastUpdateRef = useRef<number>(0);
 
     const updateUI = (fileId: string, progress: number, force = false) => {
@@ -28,6 +31,7 @@ export const useS3Upload = (
         const { file, id } = uploadingFile;
 
         try {
+            let newFileData: FileItem;
             if (file.size < MULTIPART_THRESHOLD) {
                 const { data: { url, s3Key } } = await api.post('/getSinglePresignedUrl', {
                     fileName: file.name,
@@ -45,12 +49,11 @@ export const useS3Upload = (
                     }
                 });
 
-                const completeRes = await api.post('/completeSingleUpload', {
+                const completedRes = await api.post('/completeSingleUpload', {
                     s3Key,
                     metadata: { name: file.name, size: file.size, mimeType: file.type, userId, folderId }
                 });
-                setFiles(prev=> [completeRes.data.newFile,...prev])
-
+                newFileData = completedRes.data.newFile
             } 
             else {
                 const initRes = await api.post('/initiateUpload', {
@@ -100,9 +103,15 @@ export const useS3Upload = (
                     parts: completedParts,
                     metadata: { name: file.name, size: file.size, mimeType: file.type, userId, folderId }
                 });
-                setFiles(prev=> [completedRes.data.newFile,...prev])
+                newFileData = completedRes.data.newFile
 
                 console.log("Completed res: ",completedRes)
+            }
+
+            if(pageName==='home'){
+                setFiles(prev=>[newFileData,...prev]);
+            } else{
+                setRecentsFiles(prev=> [newFileData, ...prev])
             }
 
             updateUI(id, 100, true);
