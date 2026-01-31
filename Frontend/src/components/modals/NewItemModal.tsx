@@ -8,6 +8,7 @@ import { File, FileText, FolderPlus, Image, Upload } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { Label } from '../ui/label';
 import { Input } from '../ui/input';
+import { toast } from 'sonner';
 type NewItemModalProps = {
     open: boolean;
     onOpenChange: (open:boolean) => void;
@@ -38,6 +39,10 @@ const NewItemModal = ({open, onOpenChange, onStartUpload}:NewItemModalProps) => 
 
     const handleFileUpload = (files:FileList|null) => {
         if(!files || files.length===0) return;
+        if(files.length>3){
+            toast.info('You cannot upload more than 3 files in parallel.')
+            return
+        }
 
         onStartUpload?.(Array.from(files));
         handleClose();
