@@ -4,7 +4,7 @@ const useCurrentLocation = () => {
     const {pathname}  = useLocation();
     const pathParts = pathname.split('/').filter(Boolean);
     let rawPage : AvailablePages = pathParts[1] as AvailablePages
-    let pageName : AvailablePages = rawPage || 'home'
+    let pageName : AvailablePages = rawPage || 'index'
     return {pageName}
 
 }
